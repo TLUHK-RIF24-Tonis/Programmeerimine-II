@@ -2,6 +2,7 @@ import express, { Request, Response} from 'express';
 import userService from './users/userService';
 import coursesService from './courses/coursesService';
 import gamesService from './games/gamesService';
+import discsService from './discs/discsService';
 
 const app = express();
 app.use(express.json());
@@ -110,6 +111,13 @@ app.get('/games/:id', (req: Request, res: Response) => {
 
     const game = gamesService.getGameById(id);
 
+    if (!game) {
+        return res.status(404).json ({
+            success: false,
+            message: `Game does not exist!`
+        })
+    }
+
     return res.status(200).json ({
         success: true,
         message: `Game found by ID!`,
@@ -117,11 +125,39 @@ app.get('/games/:id', (req: Request, res: Response) => {
     });
 });
 
-app.listen(port, () =>{
-    console.log(`API is running on http://localhost:${port}`);
+app.get('/discs', (req: Request, res: Response) => {
+
+    const discs = discsService.getAllDiscs();
+
+    return res.status(200).json ({
+        success: true,
+        message: `All player discs loaded!`,
+        discs,
+    });
 });
+
+app.get('/discs/:id', (req: Request, res: Response) => {
+
+    const id = Number(req.params.id);
+
+    const disc = discsService.getDiscById(id);
+
+    if (disc) {   
+        return res.status(200).json ({
+        success: true,
+        message: `All player discs loaded!`,
+        disc,
+    })};
+
+    if(!disc) {
+        return res.status (404).json ({
+            success: false,
+            message: `Disc not found!`
+        })
+    }
+});
+
 
 app.listen(port, () =>{
     console.log(`API is running on http://localhost:${port}`);
 });
-

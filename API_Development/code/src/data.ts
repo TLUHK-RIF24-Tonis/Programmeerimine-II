@@ -1,6 +1,7 @@
 import IUsers from "./users/usersInterface"
 import ICourses from "./courses/coursesInterface"
 import IGames from "./games/gamesInterface";
+import IDiscs from "./discs/discsInterface";
 
 const users: IUsers[] = [
     {
@@ -47,4 +48,40 @@ const games: IGames[] = [
     }
 ];
 
-export default { courses, users, games };
+const discs: IDiscs[] = [
+    {
+    id: 1,
+    userId: 1,
+    brand: 'Innova',
+    model: 'Destroyer',
+    type: 'Driver',
+    speed: 12,
+    glide: 5,
+    turn: -1,
+    fade: 3
+    },
+    {
+    id: 2,
+    userId: 1,
+    brand: 'Dynamic Discs',
+    model: 'Raider',
+    type: 'Driver',
+    speed: 13,
+    glide: 5,
+    turn: -0.5,
+    fade: 3
+    },
+    {
+    id: 3,
+    userId: 1,
+    brand: 'Dynamic Discs',
+    model: 'Justice',
+    type: 'Mid-Range',
+    speed: 5,
+    glide: 1,
+    turn: 0.5,
+    fade: 4
+    }
+]
+
+export default { courses, users, games, discs };

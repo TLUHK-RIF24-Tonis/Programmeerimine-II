@@ -19,10 +19,10 @@ Selle projekti eesmärk on luua **discgolfi API**, mille abil mängijad saavad m
 
 |Põhiresurss|Kirjeldus|*Täiendav ressurss*|Kirjeldus|
 |:-|:-|:-|:-|
-|**User**|API-t kasutav mängija ehk kasutaja|PlayerStats|Statistika konkreetse kasutaja kohta|
-|**Course**|Discgolfi raja ülevaade|Hole|Seotud konkreetse rajaga (üks korv)|
-|**Game**|Üks mäng, mida kasutaja on mänginud konkreetsel rajal|Score|Iga mängija visete arv korvi kohta|
-|**Disc**|Kasutaja poolt kasutatav ketas|Bag|Kasutaja ketaste kogum|
+|**Users**|API-t kasutav mängija ehk kasutaja|PlayerStats|Statistika konkreetse kasutaja kohta|
+|**Courses**|Discgolfi raja ülevaade|Hole|Seotud konkreetse rajaga (üks korv)|
+|**Games**|Üks mäng, mida kasutaja on mänginud konkreetsel rajal|Score|Iga mängija visete arv korvi kohta|
+|**Discs**|Halda kogumit|Bag|Kasutaja ketaste kogum|
 
 ### Täiendavad võimalused (võib-olla)
 
@@ -36,10 +36,10 @@ Selle projekti eesmärk on luua **discgolfi API**, mille abil mängijad saavad m
 
 |Resurss|Loo|Loe|Uuenda|Kustuta|
 |:-|:-|:-|:-|:-|
-|**User**|Registreerimine|Profiili vaatamine|Profiili muutmine|Kui siis *soft-delete*|
-|**Course**|Lisa rada|Vaata radu|Uuenda rada|Kustuta rada|
-|**Game**|Loo mäng|Vaata mängu|Uuenda skoori|Kustuta mäng|
-|**Disc**|Lisa uus ketas|Vaata kettaid|Uuenda ketaste kogumit|Kustuta kogumist ketas|
+|**Users**|Registreerimine|Profiili vaatamine|Profiili muutmine|Kui siis *soft-delete*|
+|**Courses**|Lisa rada|Vaata radu|Uuenda rada|Kustuta rada|
+|**Games**|Loo mäng|Vaata mängu|Uuenda skoori|Kustuta mäng|
+|**Discs**|Lisa uus ketas|Vaata kettaid|Uuenda ketaste kogumit|Kustuta kogumist ketas|
 
 ---
 
@@ -53,7 +53,7 @@ Selle projekti eesmärk on luua **discgolfi API**, mille abil mängijad saavad m
   "username": "diskimängija",
   "email": "kasutaja@näide.ee",
   "password": "xxxxx",
-  "created_at": "26.07.2024"
+  "created_at": "26.07.2024",
   "is_active": true
 }
 ```
@@ -117,10 +117,10 @@ This **API** project helps disc golf players manage their:
 
 | Main Resource | Description | *Additional Resources* | Description |
 |:--------------|:------------|:------------------------|:------------|
-| **User**          | The player using the API              | PlayerStats | Statistics for a specific user             |
-| **Course**        | Overview of a disc golf course        | Hole        | A single basket (hole) on a course         |
-| **Game**          | A single game played by a user        | Score       | Number of throws per basket by each player |
-| **Disc**          | Discs used by the user                | Bag         | User’s collection of discs                 |
+| **Users**          | The player using the API              | PlayerStats | Statistics for a specific user             |
+| **Courses**        | Overview of a disc golf course        | Hole        | A single basket (hole) on a course         |
+| **Games**          | A single game played by a user        | Score       | Number of throws per basket by each player |
+| **Discs**          | Save and manage your discs                | Bag         | User’s collection of discs                 |
 
 ### Optional Future Features
 
@@ -132,10 +132,10 @@ This **API** project helps disc golf players manage their:
 
 | Resource | Create | Read | Update | Delete |
 |:---------|:-------|:-----|:--------|:--------|
-| **User**     | Register | View profile | Edit profile | Soft delete only |
-| **Course**   | Add course | View courses | Update course | Delete course |
-| **Game**     | Create game | View game | Update score | Delete game |
-| **Bag**      | Create bag | View bag | Update bag | Delete bag |
+| **Users**     | Register | View profile | Edit profile | Soft delete only |
+| **Courses**   | Add course | View courses | Update course | Delete course |
+| **Games**     | Create game | View game | Update score | Delete game |
+| **Bags**      | Create bag | View bag | Update bag | Delete bag |
 
 ## Data Models
 
@@ -143,12 +143,12 @@ This **API** project helps disc golf players manage their:
 
 ```json
 {
-  "user_id": 1,
+  "id": 1,
   "username": "discplayer",
   "email": "user@example.ee",
   "password": "xxxxx",
-  "created_at": "26.07.2024"
-  "is_active": true
+  "created": "26.07.2024",
+  "active": true
 }
 ```
 
@@ -156,7 +156,7 @@ This **API** project helps disc golf players manage their:
 
 ```json
 {
-  "course_id": 1,
+  "id": 1,
   "name": "Viimsi discgolfi park",
   "location": "Tallinn",
   "holes": 18,
@@ -168,10 +168,10 @@ This **API** project helps disc golf players manage their:
 
 ```json
 {
-  "game_id": 1,
-  "user_id": 1,
-  "course_id": 2,
-  "date_played": "01.09.2025",
+  "id": 1,
+  "userId": 1,
+  "courseId": 2,
+  "datePlayed": "01.09.2025",
   "score": 62,
 }
 ```
@@ -180,8 +180,8 @@ This **API** project helps disc golf players manage their:
 
 ```json
 {
-  "disc_id": 1,
-  "user_id": 1,
+  "id": 1,
+  "userId": 1,
   "brand": "Innova",
   "model": "Destroyer",
   "type": "Driver",

@@ -21,7 +21,7 @@ const getGameById = (id: number): IGames | undefined => {
     return gameId;
 };
 
-// Hetkel ei tööta päris nii nagu mõeldud, selleks vaja luua autentimist süsteem.
+// Hetkel ei tööta päris nii nagu mõeldud, selleks vaja luua autentimis süsteem.
 // Vaja oleks unikaalset ID-d või tokeni millega võrrelda.
 
 export default { getAllGames, getGameById };
