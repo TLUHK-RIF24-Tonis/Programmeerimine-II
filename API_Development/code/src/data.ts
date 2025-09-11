@@ -1,5 +1,6 @@
 import IUsers from "./users/usersInterface"
 import ICourses from "./courses/coursesInterface"
+import IGames from "./games/gamesInterface";
 
 const users: IUsers[] = [
     {
@@ -22,4 +23,28 @@ const courses: ICourses[] = [
     }
 ];
 
-export default { courses, users };
+const games: IGames[] = [
+    {
+        id: 1,
+        userId: 4,
+        courseId: 5,
+        datePlayed: new Date('26-08-2025'),
+        score: 50,
+    },
+    {
+        id: 2,
+        userId: 2,
+        courseId: 2,
+        datePlayed: new Date('26-08-2025'),
+        score: 50,
+    },
+    {
+        id: 3,
+        userId: 4,
+        courseId: 5,
+        datePlayed: new Date('26-08-2025'),
+        score: 50,
+    }
+];
+
+export default { courses, users, games };

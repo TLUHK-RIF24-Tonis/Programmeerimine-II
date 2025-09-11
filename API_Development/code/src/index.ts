@@ -1,6 +1,7 @@
 import express, { Request, Response} from 'express';
 import userService from './users/userService';
 import coursesService from './courses/coursesService';
+import gamesService from './games/gamesService';
 
 const app = express();
 app.use(express.json());
@@ -47,7 +48,7 @@ app.post('/users/:id/deactivate', (req: Request, res: Response) => {
     };
 
     if (!user.active) {
-        return res.status(400).json({
+        return res.status(208).json({
             success: false,
             message: `User with id: ${id} is already deactivated`,
         });
@@ -92,6 +93,35 @@ app.get('/courses/:id', (req: Request, res: Response) => {
     });
 });
 
+app.get('/games', (req: Request, res: Response) => {
+
+    const games = gamesService.getAllGames()
+
+    return res.status(200).json ({
+        success: true,
+        message: `All your games loaded!`,
+        games,
+    });
+});
+
+app.get('/games/:id', (req: Request, res: Response) => {
+
+    const id = Number(req.params.id);
+
+    const game = gamesService.getGameById(id);
+
+    return res.status(200).json ({
+        success: true,
+        message: `Game found by ID!`,
+        game,
+    });
+});
+
 app.listen(port, () =>{
     console.log(`API is running on http://localhost:${port}`);
 });
+
+app.listen(port, () =>{
+    console.log(`API is running on http://localhost:${port}`);
+});
+
