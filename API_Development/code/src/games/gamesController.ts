@@ -30,4 +30,43 @@ const getGameById = ( req: Request, res: Response ) => {
     });
 };
 
-export default { getGameById, getAllGames };
+const createGame = ( req: Request, res: Response ) => {
+    const { datePlayed, score, course } = req.body
+
+    const userId = Number(req.body.userId);
+    if (!userId) {
+        return res.status(401).json ({
+            success: false,
+            message: 'User ID is missing or not authorized!'
+        });
+    };
+
+    const foundCourse = gamesService.courses.find(c => c.name === course);
+
+    if (!foundCourse) {
+        return res.status(404).json ({
+            success: false,
+            message: `${course} does not exist, You can add course under course section!`
+        });
+    };
+
+    const courseId = foundCourse.id;
+
+    try {
+        const newGameId = gamesService.createGame(new Date(datePlayed), score, courseId, userId)
+
+        return res.status(201).json ({
+            success: true,
+            message: 'Game successfully created!',
+            gameId: newGameId
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to create game!',
+            error: error
+        });
+    };
+};
+
+export default { getGameById, getAllGames, createGame };
