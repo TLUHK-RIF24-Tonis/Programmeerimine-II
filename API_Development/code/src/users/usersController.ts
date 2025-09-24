@@ -48,4 +48,30 @@ const userStatus = ( req: Request, res: Response ) => {
     });
 };
 
-export default { getUserById, userStatus };
+const createUser = ( req: Request, res: Response ) => {
+    const { username, email, password } = req.body
+    if ( !username || !email || !password ) {
+        return res.status(400).json({
+            success: false,
+            message: 'login details are missing!',
+        });
+    };
+
+    const newEmail = userService.findUserByEmail(email)
+    const newUsername = userService.findUserByUsername(username)
+
+    if (newEmail || newUsername) {
+        return res.status(400).json({
+            success: false,
+            message: 'User already exist!',
+        });
+    };
+
+    const id = userService.createUser(username, email, password);
+    return res.status(201).json({
+        success: true,
+        message: `User created with id: ${id}`,
+    })
+};
+
+export default { getUserById, userStatus, createUser };

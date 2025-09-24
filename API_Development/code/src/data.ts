@@ -9,8 +9,8 @@ const users: IUsers[] = [
         username: 'KollaneKoll',
         email: 'KollaneK@mail.com',
         password: '12345',
-        created: new Date('21-10-2024'),
-        active: true,
+        created: new Date('2024-10-21'),
+        active: true, 
     }
 ];
 
@@ -84,4 +84,4 @@ const discs: IDiscs[] = [
     }
 ]
 
-export default { courses, users, games, discs };
+export { courses, users, games, discs };
