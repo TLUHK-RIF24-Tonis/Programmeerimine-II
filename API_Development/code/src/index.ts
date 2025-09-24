@@ -1,8 +1,8 @@
 import express, { Request, Response} from 'express';
 import userService from './users/userService';
-import coursesService from './courses/coursesService';
 import gamesService from './games/gamesService';
 import discsService from './discs/discsService';
+import coursesRouter from './courses/coursesRouter'
 
 const app = express();
 app.use(express.json());
@@ -64,35 +64,7 @@ app.post('/users/:id/deactivate', (req: Request, res: Response) => {
     });
 });
 
-app.get('/courses', (req: Request, res: Response) => {
-
-    const courses = coursesService.getAllCourses();
-
-    return res.status(200).json({
-        success: true,
-        message: 'Courses loaded!',
-        courses
-    });
-});
-
-app.get('/courses/:id', (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    const course = coursesService.getCourseById(id);
-
-    if(!course) {
-        return res.status(400).json ({
-            success: false,
-            message: `Course with this id: ${id} does not exist!`
-        });
-    };
-
-    return res.status(200).json ({
-        success: true,
-        message: `Course with id: ${id} found!`,
-        course,
-    });
-});
+app.use('/courses', coursesRouter);
 
 app.get('/games', (req: Request, res: Response) => {
 
