@@ -1,8 +1,8 @@
 import express, { Request, Response} from 'express';
 import userService from './users/userService';
-import gamesService from './games/gamesService';
 import coursesRouter from './courses/coursesRouter';
 import discsRouter from './discs/discsRouter';
+import gamesRouter from './games/gamesRouter';
 
 const app = express();
 app.use(express.json());
@@ -65,38 +65,7 @@ app.post('/users/:id/deactivate', (req: Request, res: Response) => {
 });
 
 app.use('/courses', coursesRouter);
-
-app.get('/games', (req: Request, res: Response) => {
-
-    const games = gamesService.getAllGames()
-
-    return res.status(200).json ({
-        success: true,
-        message: `All your games loaded!`,
-        games,
-    });
-});
-
-app.get('/games/:id', (req: Request, res: Response) => {
-
-    const id = Number(req.params.id);
-
-    const game = gamesService.getGameById(id);
-
-    if (!game) {
-        return res.status(404).json ({
-            success: false,
-            message: `Game does not exist!`
-        })
-    }
-
-    return res.status(200).json ({
-        success: true,
-        message: `Game found by ID!`,
-        game,
-    });
-});
-
+app.use('/games', gamesRouter);
 app.use('/discs', discsRouter);
 
 app.listen(port, () =>{
