@@ -47,56 +47,109 @@ Selle projekti eesmärk on luua **discgolfi API**, mille abil mängijad saavad m
 
 ### **Kasutaja**
 
-```json
+```typescript
 {
-  "user_id": 1,
-  "username": "diskimängija",
-  "email": "kasutaja@näide.ee",
-  "password": "xxxxx",
-  "created_at": "26.07.2024",
-  "is_active": true
+  id: 1,
+  username: "diskimängija",
+  email: "kasutaja@näide.ee",
+  password: "xxxxx",
+  created_at: "26.07.2024",
+  active: true
 }
 ```
 
 ### **Rada**  
 
-```json
+```typescript
 {
-  "course_id": 1,
-  "name": "Viimsi discgolfi park",
-  "location": "Tallinn",
-  "holes": 18,
-  "par": 54
+  id: 1,
+  name: "Viimsi discgolfi park",
+  location: "Tallinn",
+  holes: 18,
+  par: 54
 }
 ```
 
 ### **Mäng**
 
-```json
+```typescript
 {
-  "game_id": 1,
-  "user_id": 1,
-  "course_id": 2,
-  "date_played": "01.09.2025",
-  "score": 62,
+  id: 1,
+  userId: 1,
+  courseId: 2,
+  datePlayed: "01.09.2025",
+  score: 62,
 }
 ```
 
 ### **Ketas**
 
-```json
+```typescript
 {
-  "disc_id": 1,
-  "user_id": 1,
-  "brand": "Innova",
-  "model": "Destroyer",
-  "type": "Driver",
-  "speed": 12,
-  "glide": 5,
-  "turn": -1,
-  "fade": 3
+  id: 1,
+  brand: "Innova",
+  model: "Destroyer",
+  type: "Driver",
+  speed: 12,
+  glide: 5,
+  turn: -1,
+  fade: 3
 }
 ```
+
+### **Kasutajate kettad**
+
+```typescript
+{
+  userId: 1,
+  discId: 2,
+  addedAt: "25.09.2025";
+}
+```
+
+## Kuidas käivatad antud projekti  
+
+**1. Projekti Ettevalmistamine (Sõltuvuste paigaldamine)**  
+Mine bashis oma projekti põhikausta (kus asuvad failid nagu index.ts ja package.json) ning paigalda kõik vajalikud paketid:
+
+```bash
+npm install
+```
+
+---
+
+### Käivitamine
+
+### Arendusrežiim (Dev Mode) 🛠️
+
+**1. Käivita skriptiga:**
+
+```bash
+npm run dev
+# VÕI
+npm start
+```
+
+**2. Käivita otse ts-node abil (kui skripti pole):**
+
+```bash
+npx ts-node index.ts
+```
+
+**3. Kontroll ja Testimine**  
+
+Kui server on käivitunud, peaks bashis ilmuma teade:
+
+```bash
+API is running on http://localhost:3000
+```
+
+Tee GET päring (näiteks brauseris või ThunderClientis) aadressile: [http://localhost:3000/]
+
+Eeldatav edukas vastus on: **{"success":true,"message":"API is running!"}**.  
+
+<br>
+<br>
 
 # Project: DiscGolf Tracker API //  
 
@@ -141,53 +194,106 @@ This **API** project helps disc golf players manage their:
 
 ### **User**
 
-```json
+```typescript
 {
-  "id": 1,
-  "username": "discplayer",
-  "email": "user@example.ee",
-  "password": "xxxxx",
-  "created": "26.07.2024",
-  "active": true
+  id: 1,
+  username: "discplayer",
+  email: "user@example.ee",
+  password: "xxxxx",
+  created: "26.07.2024",
+  active: true
 }
 ```
 
 ### **Course**  
 
-```json
+```typescript
 {
-  "id": 1,
-  "name": "Viimsi discgolfi park",
-  "location": "Tallinn",
-  "holes": 18,
-  "par": 54
+  id: 1,
+  name: "Viimsi discgolfi park",
+  location: "Tallinn",
+  holes: 18,
+  par: 54
 }
 ```
 
 ### **Game**
 
-```json
+```typescript
 {
-  "id": 1,
-  "userId": 1,
-  "courseId": 2,
-  "datePlayed": "01.09.2025",
-  "score": 62,
+  id: 1,
+  userId: 1,
+  courseId: 2,
+  datePlayed: "01.09.2025",
+  score: 62,
 }
 ```
 
 ### **Disc**
 
-```json
+```typescript
 {
-  "id": 1,
-  "userId": 1,
-  "brand": "Innova",
-  "model": "Destroyer",
-  "type": "Driver",
-  "speed": 12,
-  "glide": 5,
-  "turn": -1,
-  "fade": 3
+  id: 1,
+  brand: "Innova",
+  model: "Destroyer",
+  type: "Driver",
+  speed: 12,
+  glide: 5,
+  turn: -1,
+  fade: 3
 }
 ```
+
+### **UserDiscs**
+
+```typescript
+{
+  userId: 1,
+  discId: 2,
+  addedAt: "25.09.2025";
+}
+```
+
+<br>
+
+## How to run this project
+
+**1. Project Setup (Install Dependencies)**  
+
+In your bash, navigate to the project's root folder (where files like index.ts and package.json are located) and install all required packages:
+
+```bash
+npm install
+```
+
+**2. Execution**
+
+### A. Development Mode 🛠️
+
+Development mode often uses ts-node or nodemon to automatically compile and restart the server after code changes.
+
+Run with a script:
+
+```bash
+npm run dev
+# OR
+npm start
+```
+
+Run directly with ts-node (if no script is available):
+
+```bash
+npx ts-node index.ts
+```
+
+**3. Verification and Testing**
+
+Once the server has started, a message should appear in the terminal:
+
+```bash
+API is running on http://localhost:3000
+```
+
+Make a GET request (e.g., in a browser or ThunderClient) to the address: [http://localhost:3000/]
+
+The expected successful response is: **{"success":true,"message":"API is running!"}**.
