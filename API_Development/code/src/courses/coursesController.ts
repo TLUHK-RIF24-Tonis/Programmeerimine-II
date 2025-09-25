@@ -32,4 +32,39 @@ const getCourseById = (req: Request, res: Response) => {
     });
 };
 
-export default { getAllCourses, getCourseById };
+const createCourse = ( req: Request, res: Response ) => {
+    const { name, location, holes, par } = req.body;
+
+    if ( !name || !location ) {
+        return res.status(400).json ({
+            success: false,
+            message: 'Course name or location can not be empty'
+        })
+    }
+    if ( holes === "" || par === "") {
+        return res.status(400).json ({
+            success: false,
+            message: 'Course must have hole number and course PAR'
+        })
+    }
+
+    const course = coursesService.createCourse( name, location, holes, par )
+
+    if ( !course ) {
+        return res.status(409).json ({
+            success: false,
+            message: 'Course already exist!'
+        })
+    } else {
+        return res.status(201).json ({
+            success: true,
+            message: 'Course created!',
+            name,
+            location,
+            holes,
+            par
+        })
+    }
+}
+
+export default { getAllCourses, getCourseById, createCourse };

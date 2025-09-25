@@ -35,13 +35,20 @@ const createGame = ( req: Request, res: Response ) => {
     const { datePlayed, score, course } = req.body
 
     const userId = Number(req.body.userId);
-    const checkUserId = userService.getUserById(userId);
-    if (!userId || (!checkUserId || undefined)) {
-        return res.status(401).json ({
+    if ( !userId ) {
+        return res.status(400).json ({
             success: false,
-            message: 'User ID is missing or not authorized!'
+            message: 'User ID is missing from creation request!'
         });
     };
+
+    const checkUser = userService.getUserById(userId);
+    if ( !checkUser ) {
+        return res.status(401).json ({
+            success: false,
+            message: 'User is not authorized or does not exist!'
+        })
+    }
 
     const foundCourse = gamesService.courses.find(c => c.name === course);
 
@@ -65,7 +72,7 @@ const createGame = ( req: Request, res: Response ) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: 'Failed to create game!',
+            message: 'Failed to create game due to server error!',
             error: error
         });
     };

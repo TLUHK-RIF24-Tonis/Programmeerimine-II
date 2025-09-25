@@ -17,7 +17,7 @@ const createDisc = ( brand: string, model: string,type: IDiscs["type"] , speed: 
     const allDiscs = getAllDiscs();
     const exist = allDiscs.some(d => d.brand === brand && d.model === model);
 
-    if (exist) return null;
+    if ( exist ) return null;
 
     const disc: IDiscs | null = {
         id,
