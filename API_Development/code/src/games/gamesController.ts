@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import gamesService from "./gamesService";
+import userService from "../users/userService";
 
 const getAllGames = ( req: Request, res: Response ) => {
     const games = gamesService.getAllGames()
@@ -34,7 +35,8 @@ const createGame = ( req: Request, res: Response ) => {
     const { datePlayed, score, course } = req.body
 
     const userId = Number(req.body.userId);
-    if (!userId) {
+    const checkUserId = userService.getUserById(userId);
+    if (!userId || (!checkUserId || undefined)) {
         return res.status(401).json ({
             success: false,
             message: 'User ID is missing or not authorized!'
