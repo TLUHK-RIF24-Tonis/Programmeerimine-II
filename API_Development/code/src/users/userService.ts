@@ -2,6 +2,10 @@ import { users } from '../data';
 import hashService from '../general/hashService';
 import IUsers from './usersInterface';
 
+const getAllUsers = (): IUsers[] => {
+ return users;
+};
+
 const getUserById = (id: number): IUsers | undefined => {
     const user = users.find(user => user.id === id);
     return user;
@@ -50,4 +54,4 @@ const findUserByUsername = ( username: string): IUsers | undefined => {
 }
 
 
-export default { getUserById, changeUserInfo, createUser, findUserByEmail, findUserByUsername };
+export default { getUserById, changeUserInfo, createUser, findUserByEmail, findUserByUsername, getAllUsers };

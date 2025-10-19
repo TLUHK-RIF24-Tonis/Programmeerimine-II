@@ -1,6 +1,15 @@
 import { Request, Response } from "express";
 import userService from "./userService";
 
+const getAllUsers = ( req: Request, res: Response ) => {
+    const users = userService.getAllUsers();
+    return res.status(200).json({
+        success: true,
+        users,
+        message: 'List of users'
+    })
+};
+
 const getUserById = ( req: Request, res: Response ) => {
     const id = Number(req.params.id);
 
@@ -74,4 +83,4 @@ const createUser = ( req: Request, res: Response ) => {
     })
 };
 
-export default { getUserById, userStatus, createUser };
+export default { getUserById, userStatus, createUser, getAllUsers };
