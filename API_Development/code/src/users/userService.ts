@@ -1,4 +1,5 @@
 import { users } from '../data';
+import hashService from '../general/hashService';
 import IUsers from './usersInterface';
 
 const getUserById = (id: number): IUsers | undefined => {
@@ -20,16 +21,18 @@ const createUser = (  username:string ,email: string, password: string ): number
     const created: Date = new Date()
     const active: boolean = true;
 
-    const user: IUsers = {
+    const hashed = hashService.hash(password);
+    const newUser: IUsers = {
         id,
         username,
         email,
         password,
         created,
         active,
+        role: 'user',
     };
 
-    users.push(user);
+    users.push(newUser);
 
     return id;
 };
