@@ -8,20 +8,69 @@ const users: IUsers[] = [
         id: 1,
         username: 'KollaneKoll',
         email: 'KollaneK@mail.com',
-        password: '12345',
-        created: new Date('2024-10-21'),
+        password: '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa',
+        created: new Date(),
         active: true, 
+        role: 'user',
+    },
+    {
+        id: 2,
+        username: 'ParimGolfar1',
+        email: 'PGolfar@outlook.com',
+        password: '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa',
+        created: new Date(),
+        active: true, 
+        role: 'user',
+    },
+    {
+        id: 3,
+        username: 'SuvalineTegelane',
+        email: 'tegin2ra@gmail.com',
+        password: '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa',
+        created: new Date(),
+        active: true, 
+        role: 'user',
+    },
+    {
+        id: 4,
+        username: 'Kangutaja',
+        email: 'Kangutaja123@yahoo.com',
+        password: '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa',
+        created: new Date(),
+        active: true, 
+        role: 'user',
     }
 ];
 
 const courses: ICourses[] = [
     {
         id: 1,
-        name: 'Kurna discgolfi rada',
+        name: 'Kurna Discgolfipark',
         location: 'Kurna mõisapark',
         holes: 18,
         par: 54,
-    }
+    },
+    {
+        id: 2,
+        name: 'Männiku Discgolfipark',
+        location: 'Männiku',
+        holes: 18,
+        par: 57,
+    },
+    {
+        id: 3,
+        name: 'Haapsalu Discgolfipark',
+        location: 'Uuemõisa park',
+        holes: 18,
+        par: 57,
+    },
+    {
+        id: 4,
+        name: 'Muraste Discgolfipark',
+        location: 'Kurna mõisapark',
+        holes: 18,
+        par: 57,
+    },
 ];
 
 const games: IGames[] = [
@@ -82,12 +131,12 @@ const discs: IDiscs[] = [
 ]
 
 const userDiscs: IUserDiscs[] = [
-    { userId: 1, discId: 1, addedAt: "25-09-2025" },
-    { userId: 1, discId: 2, addedAt: "25-09-2025" },
-    { userId: 2, discId: 1, addedAt: "25-09-2025" },
-    { userId: 3, discId: 4, addedAt: "25-09-2025" },
-    { userId: 4, discId: 1, addedAt: "25-09-2025" },
-    { userId: 2, discId: 3, addedAt: "25-09-2025" },
+    { userId: 1, discId: 1, addedAt: new Date() },
+    { userId: 1, discId: 2, addedAt: new Date() },
+    { userId: 2, discId: 1, addedAt: new Date() },
+    { userId: 3, discId: 4, addedAt: new Date() },
+    { userId: 4, discId: 1, addedAt: new Date() },
+    { userId: 2, discId: 3, addedAt: new Date() },
 ]
 
 export { courses, users, games, discs, userDiscs };

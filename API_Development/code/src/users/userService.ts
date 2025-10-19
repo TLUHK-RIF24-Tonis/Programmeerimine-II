@@ -26,7 +26,7 @@ const createUser = (  username:string ,email: string, password: string ): number
         id,
         username,
         email,
-        password,
+        password: hashed,
         created,
         active,
         role: 'user',
