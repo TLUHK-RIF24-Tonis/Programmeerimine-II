@@ -4,6 +4,7 @@ import gamesController from "./gamesController";
 const router = Router();
 
 router.get('/', gamesController.getAllGames);
+router.get('/myGames', gamesController.getMyGames);
 router.get('/:id', gamesController.getGameById);
 router.post('/add', gamesController.createGame);
 

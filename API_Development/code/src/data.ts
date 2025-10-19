@@ -78,21 +78,21 @@ const games: IGames[] = [
         id: 1,
         userId: 4,
         courseId: 5,
-        datePlayed: new Date('26-08-2025'),
+        datePlayed: new Date(),
         score: 50,
     },
     {
         id: 2,
         userId: 2,
         courseId: 2,
-        datePlayed: new Date('26-08-2025'),
+        datePlayed: new Date(),
         score: 50,
     },
     {
         id: 3,
         userId: 4,
         courseId: 5,
-        datePlayed: new Date('26-08-2025'),
+        datePlayed: new Date(),
         score: 50,
     }
 ];
