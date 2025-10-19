@@ -11,7 +11,7 @@ const users: IUsers[] = [
         password: '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa',
         created: new Date(),
         active: true, 
-        role: 'user',
+        role: 'admin',
     },
     {
         id: 2,

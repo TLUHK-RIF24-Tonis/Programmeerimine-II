@@ -7,4 +7,9 @@ const hash = (password: string): string => {
     return hashed;
 };
 
-export default { hash };
+const compare = ( password: string, hash: string ): boolean => {
+    const match = bcrypt.compareSync( password, hash );
+    return match;
+};
+
+export default { hash, compare };

@@ -3,6 +3,7 @@ import coursesRouter from './courses/coursesRouter';
 import discsRouter from './discs/discsRouter';
 import gamesRouter from './games/gamesRouter';
 import userRouter from './users/usersRouter';
+import authController from './auth/authController';
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,8 @@ app.get('/', (req, res) => {
         message: 'API is running!',
     });
 });
+
+app.use('/auth/login', authController.login);
 
 app.use('/users', userRouter);
 app.use('/courses', coursesRouter);
