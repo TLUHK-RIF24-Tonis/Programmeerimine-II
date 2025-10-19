@@ -4,6 +4,9 @@ import discsRouter from './discs/discsRouter';
 import gamesRouter from './games/gamesRouter';
 import userRouter from './users/usersRouter';
 import authController from './auth/authController';
+import isAdmin from './auth/isAdmin';
+import isLoggedIn from './auth/isLoggedMiddleware';
+import usersController from './users/usersController';
 
 const app = express();
 app.use(express.json());
@@ -17,9 +20,10 @@ app.get('/', (req, res) => {
     });
 });
 
-app.use('/auth/login', authController.login);
-
-app.use('/users', userRouter);
+app.post('/users', usersController.createUser);
+app.post('/auth/login', authController.login);
+app.use(isLoggedIn)
+app.use('/users', isAdmin, userRouter);
 app.use('/courses', coursesRouter);
 app.use('/games', gamesRouter);
 app.use('/discs', discsRouter);

@@ -49,9 +49,8 @@ const findUserByEmail = ( email: string ): IUsers | undefined => {
 
 const findUserByUsername = ( username: string): IUsers | undefined => {
     const oldUsername = users.find((x => x.username === username));
-
     return oldUsername;
-}
+};
 
 
 export default { getUserById, changeUserInfo, createUser, findUserByEmail, findUserByUsername, getAllUsers };

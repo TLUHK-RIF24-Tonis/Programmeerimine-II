@@ -7,4 +7,12 @@ const createToken = ( payload: Omit<IUsers, 'password' | 'created' | 'active'> )
     return token
 };
 
-export default { createToken };
+const verify = ( token: string ) => {
+    try {
+    return jwt.verify( token, config.jwtSecret );
+    } catch ( e ) {
+        return null;
+    }
+}
+
+export default { createToken, verify };
