@@ -17,6 +17,31 @@ app.get('/', (req, res) => {
     return res.status (200).json({
         success: true,
         message: 'API is running!',
+        endpoints: {
+            USERS:{
+            "GET /users": 'Get all users',
+            "GET /users/:id": 'Get user by ID',
+            "POST /users/:id/status": 'Change user active status'
+            },
+            GAMES:{
+            "GET /games": 'Get all games',
+            "GET /games/myGames": 'Get logged in user specific games',
+            "GET /games/:id": 'Get game by ID',
+            "POST /games/add": 'Add game'
+            },
+            DISCS:{
+            "GET /discs": 'Get all discs',
+            "GET /discs/:id": 'Get disc by ID',
+            "POST /discs": 'Add new disc',
+            "GET /discs/user/:id": 'Get one specific user discs',
+            "POST /discs/user/disc/check": 'Check if user(:id) has this disc(:id)'
+            },
+            COURSES:{
+            "GET /courses": 'Get all courses',
+            "GET /courses/:id": 'Get course by ID',
+            "POST /courses": 'Add new course'
+            }
+        }
     });
 });
 
