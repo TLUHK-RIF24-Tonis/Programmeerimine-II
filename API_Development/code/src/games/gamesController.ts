@@ -78,4 +78,19 @@ const createGame = ( req: Request, res: Response ) => {
     };
 };
 
-export default { getGameById, getAllGames, createGame };
+const getMyGames = ( req: Request, res: Response ) => {
+    const user = res.locals.user as { id?: number };
+    if ( !user?.id ) {
+        return res.status(401).json({
+            success: false,
+            message: `Invalid token`
+        });
+    };
+    const games = gamesService.getAllGames(user.id);
+    return res.status(200).json({
+        success: true,
+        Games: games
+    });
+};
+
+export default { getGameById, getAllGames, createGame, getMyGames };

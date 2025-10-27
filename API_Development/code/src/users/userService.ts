@@ -1,5 +1,10 @@
 import { users } from '../data';
+import hashService from '../general/hashService';
 import IUsers from './usersInterface';
+
+const getAllUsers = (): IUsers[] => {
+ return users;
+};
 
 const getUserById = (id: number): IUsers | undefined => {
     const user = users.find(user => user.id === id);
@@ -20,16 +25,18 @@ const createUser = (  username:string ,email: string, password: string ): number
     const created: Date = new Date()
     const active: boolean = true;
 
-    const user: IUsers = {
+    const hashed = hashService.hash(password);
+    const newUser: IUsers = {
         id,
         username,
         email,
-        password,
+        password: hashed,
         created,
         active,
+        role: 'user',
     };
 
-    users.push(user);
+    users.push(newUser);
 
     return id;
 };
@@ -42,9 +49,8 @@ const findUserByEmail = ( email: string ): IUsers | undefined => {
 
 const findUserByUsername = ( username: string): IUsers | undefined => {
     const oldUsername = users.find((x => x.username === username));
-
     return oldUsername;
-}
+};
 
 
-export default { getUserById, changeUserInfo, createUser, findUserByEmail, findUserByUsername };
+export default { getUserById, changeUserInfo, createUser, findUserByEmail, findUserByUsername, getAllUsers };

@@ -11,7 +11,7 @@ interface IDiscs {
 interface IUserDiscs {
     userId: number,
     discId: number,
-    addedAt: string;
+    addedAt: Date;
 };
 
 export { IDiscs, IUserDiscs };

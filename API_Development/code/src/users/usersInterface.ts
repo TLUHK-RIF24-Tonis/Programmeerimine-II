@@ -5,6 +5,7 @@ interface IUsers {
     password: string;
     created: Date;
     active: boolean;
+    role: 'user' | 'admin';
 }
 
 export default IUsers;
