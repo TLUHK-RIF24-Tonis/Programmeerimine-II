@@ -7,11 +7,12 @@ import authController from './auth/authController';
 import isAdmin from './auth/isAdmin';
 import isLoggedIn from './auth/isLoggedMiddleware';
 import usersController from './users/usersController';
+import config from './config';
 
 const app = express();
 app.use(express.json());
 
-let port = 3000;
+let port = process.env.PORT;
 
 app.get('/', (req, res) => {
     return res.status (200).json({
