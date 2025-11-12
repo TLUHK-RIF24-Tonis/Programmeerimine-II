@@ -1,22 +1,23 @@
 import { users } from '../data';
 import hashService from '../general/hashService';
-import IUsers from './usersInterface';
+import IUsers, { IUsersData } from './usersInterface';
+import pool from '../database';
+import { FieldPacket } from 'mysql2';
 
-const getAllUsers = (): IUsers[] => {
- return users;
+const getAllUsers = async () : Promise<IUsers[]> => {
+    const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, email, username, role, created_at as createdAt FROM users;');
+    return rows;
 };
 
-const getUserById = (id: number): IUsers | undefined => {
-    const user = users.find(user => user.id === id);
-    return user;
+const getUserById = async (id: number): Promise<IUsers | undefined> => {
+    const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, email, username, role, created_at as createdAt, active as Active FROM users WHERE id = ?;', [id]);
+    return rows[0];
 };
 
-const changeUserInfo = (id: number): IUsers | undefined => {
-    const user = getUserById(id);
-    if (!user) return undefined;
-
-    user.active = false;
-    return user;
+const changeUserStatus = async (id: number): Promise<IUsers> => {
+  await pool.query('UPDATE users SET active = NOT active WHERE id = ?', [id]);
+  const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, username , active FROM users WHERE id = ?', [id]);
+  return rows[0];
 };
 
 const createUser = (  username:string ,email: string, password: string ): number => {
@@ -26,7 +27,7 @@ const createUser = (  username:string ,email: string, password: string ): number
     const active: boolean = true;
 
     const hashed = hashService.hash(password);
-    const newUser: IUsers = {
+    const newUser: IUsersData = {
         id,
         username,
         email,
@@ -41,10 +42,9 @@ const createUser = (  username:string ,email: string, password: string ): number
     return id;
 };
 
-const findUserByEmail = ( email: string ): IUsers | undefined => {
-    const oldEmail = users.find((u) => u.email === email);
-
-    return oldEmail;
+const findUserByEmail = async ( email: string ): Promise<IUsers | undefined> => {
+    const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT email FROM users WHERE email = ?;', [email]);
+    return rows[0];
 };
 
 const findUserByUsername = ( username: string): IUsers | undefined => {
@@ -53,4 +53,4 @@ const findUserByUsername = ( username: string): IUsers | undefined => {
 };
 
 
-export default { getUserById, changeUserInfo, createUser, findUserByEmail, findUserByUsername, getAllUsers };
+export default { getUserById, changeUserStatus, createUser, findUserByEmail, findUserByUsername, getAllUsers };
