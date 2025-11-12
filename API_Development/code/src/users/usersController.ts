@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import userService from "./userService";
 
-const getAllUsers = ( req: Request, res: Response ) => {
-    const users = userService.getAllUsers();
+const getAllUsers = async ( req: Request, res: Response ) => {
+    const users = await userService.getAllUsers();
     return res.status(200).json({
         success: true,
         users,
@@ -10,10 +10,10 @@ const getAllUsers = ( req: Request, res: Response ) => {
     })
 };
 
-const getUserById = ( req: Request, res: Response ) => {
+const getUserById = async ( req: Request, res: Response ) => {
     const id = Number(req.params.id);
 
-    const user = userService.getUserById(id);
+    const user = await userService.getUserById(id);
 
     if (!user) {
         return res.status(400).json({
@@ -29,32 +29,29 @@ const getUserById = ( req: Request, res: Response ) => {
     });
 };
 
-const userStatus = ( req: Request, res: Response ) => {
+const userStatus = async ( req: Request, res: Response ) => {
     const id = Number(req.params.id);
 
-    const user = userService.getUserById(id);
+    const user = await userService.getUserById(id);
+    const changeStatus = await userService.changeUserStatus(id);
 
+    if (!changeStatus.active) {
+    return res.status(200).json({
+        success: false,
+        message: `${changeStatus.username} is not active!`
+    });
+}
     if (!user) {
     return res.status(400).json({
         success: false,
         message: `User with this id: ${id} was not found!`
     });
-    };
-
-    if (!user.active) {
-        return res.status(208).json({
-            success: false,
-            message: `User with id: ${id} is already deactivated`,
-        });
-    };
-
-    const updatedUser = userService.changeUserInfo(id);
-
+}   else { 
     return res.status(200).json({
-    success: true,
-    message: 'User successfully deactivated!',
-    user: updatedUser
-    });
+        success: true,
+        message: `${changeStatus.username} is active `
+    })
+    }
 };
 
 const createUser = ( req: Request, res: Response ) => {
