@@ -20,37 +20,31 @@ const changeUserStatus = async (id: number): Promise<IUsers> => {
   return rows[0];
 };
 
-const createUser = (  username:string ,email: string, password: string ): number => {
-    const id = users[users.length - 1].id + 1;
-
-    const created: Date = new Date()
-    const active: boolean = true;
-
-    const hashed = hashService.hash(password);
-    const newUser: IUsersData = {
-        id,
-        username,
-        email,
-        password: hashed,
-        created,
-        active,
-        role: 'user',
-    };
-
-    users.push(newUser);
-
-    return id;
+const createUser = async ( username:string ,email: string, password: string, role = 'user' ) => {
+    const sql = `
+    INSERT INTO users ( username, email, password_hash, role )
+    VALUES (?, ?, ?, ?)
+    `;
+    const [result] = await pool.execute(sql, [username, email, password, role]);
+    return result;
 };
 
-const findUserByEmail = async ( email: string ): Promise<IUsers | undefined> => {
-    const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT email FROM users WHERE email = ?;', [email]);
+const getUserByIdent = async ( email: string, username: string ): Promise<IUsers | undefined> => {
+    const [rows]: [IUsers[], FieldPacket[]] = await pool.query(
+        `SELECT id, email, username, role, created_at as createdAt,
+        active as Active FROM users WHERE email = ? OR username = ?;`, [email, username]);
     return rows[0];
 };
 
-const findUserByUsername = ( username: string): IUsers | undefined => {
-    const oldUsername = users.find((x => x.username === username));
-    return oldUsername;
+const findUserByUsername = async ( username: string): Promise<IUsers | undefined> => {
+    const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, email, username, role, created_at as createdAt, active FROM users WHERE username = ?;', [username]);
+    return rows[0];
 };
 
+const findUserPassword = async ( id: number ): Promise<string | undefined> => {
+    const [rows]: [any[], FieldPacket[]] = await pool.execute('SELECT password_hash FROM users WHERE id = ?;', [id]);
+    return rows[0]?.password_hash;
+}
 
-export default { getUserById, changeUserStatus, createUser, findUserByEmail, findUserByUsername, getAllUsers };
+
+export default { getUserById, changeUserStatus, createUser, getUserByIdent, findUserByUsername, getAllUsers, findUserPassword };
