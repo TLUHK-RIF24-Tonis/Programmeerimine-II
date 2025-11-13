@@ -2,7 +2,7 @@ import { users } from '../data';
 import hashService from '../general/hashService';
 import IUsers, { IUsersData } from './usersInterface';
 import pool from '../database';
-import { FieldPacket } from 'mysql2';
+import { FieldPacket, ResultSetHeader } from 'mysql2';
 
 const getAllUsers = async () : Promise<IUsers[]> => {
     const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, email, username, role, created_at as createdAt FROM users;');
@@ -25,7 +25,7 @@ const createUser = async ( username:string ,email: string, password: string, rol
     INSERT INTO users ( username, email, password_hash, role )
     VALUES (?, ?, ?, ?)
     `;
-    const [result] = await pool.execute(sql, [username, email, password, role]);
+    const [result] = await pool.execute<ResultSetHeader>(sql, [username, email, password, role]);
     return result;
 };
 
