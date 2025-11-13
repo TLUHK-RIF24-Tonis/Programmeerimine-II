@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import userService from "./userService";
+import { ResultSetHeader } from "mysql2";
 
 const getAllUsers = async ( req: Request, res: Response ) => {
     const users = await userService.getAllUsers();
@@ -54,32 +55,43 @@ const userStatus = async ( req: Request, res: Response ) => {
     }
 };
 
-const createUser = ( req: Request, res: Response ) => {
+const createUser = async ( req: Request, res: Response ) => {
     const { username, email, password } = req.body
-
-    const result = userService.createUser(username, email, password);
 
     if ( !username || !email || !password ) {
         return res.status(400).json({
             success: false,
-            message: `login details are missing! ${result}`,
+            message: `login details are missing!`
         });
     };
 
-    const checkIdent = userService.getUserByIdent(username, email);
+    const checkIdent = await userService.getUserByIdent(username, email);
 
-    if (!(!checkIdent)) {
+    if ((checkIdent)) {
         return res.status(400).json({
             success: false,
             message: 'User already exist!',
         });
     };
 
-    const id = userService.createUser(username, email, password);
+    try {
+    const createUser = await userService.createUser(username, email, password);
     return res.status(201).json({
         success: true,
-        message: `User created with id: ${id}`,
-    })
+        message: `User created with id: ${createUser.insertId}`,
+    })} catch ( err: any) {
+        if ( err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({
+                success: false,
+                message: `Username or email already taken`
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                message: 'Database error:', err
+            });
+        }
+    };
 };
 
 export default { getUserById, userStatus, createUser, getAllUsers };
