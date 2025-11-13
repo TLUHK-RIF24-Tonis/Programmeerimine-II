@@ -56,17 +56,19 @@ const userStatus = async ( req: Request, res: Response ) => {
 
 const createUser = ( req: Request, res: Response ) => {
     const { username, email, password } = req.body
+
+    const result = userService.createUser(username, email, password);
+
     if ( !username || !email || !password ) {
         return res.status(400).json({
             success: false,
-            message: 'login details are missing!',
+            message: `login details are missing! ${result}`,
         });
     };
 
-    const newEmail = userService.findUserByEmail(email)
-    const newUsername = userService.findUserByUsername(username)
+    const checkIdent = userService.getUserByIdent(username, email);
 
-    if (newEmail || newUsername) {
+    if (!(!checkIdent)) {
         return res.status(400).json({
             success: false,
             message: 'User already exist!',

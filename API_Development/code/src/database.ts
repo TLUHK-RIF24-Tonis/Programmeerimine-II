@@ -9,6 +9,9 @@ const pool = mysql
     password: config.db.password,
     database: config.db.database,
     multipleStatements: true,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 })
 .promise();
 
