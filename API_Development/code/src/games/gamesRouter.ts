@@ -1,9 +1,10 @@
 import { Router } from "express";
 import gamesController from "./gamesController";
+import isAdmin from "../auth/isAdmin";
 
 const router = Router();
 
-router.get('/', gamesController.getAllGames);
+router.get('/', isAdmin ,gamesController.getAllGames);
 router.get('/myGames', gamesController.getMyGames);
 router.get('/:id', gamesController.getGameById);
 router.post('/add', gamesController.createGame);

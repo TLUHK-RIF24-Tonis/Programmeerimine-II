@@ -5,47 +5,62 @@ import IGames from "./gamesInterface";
 
 const getAllGames = async () : Promise<IGames[]> => {
     const [rows]: [IGames[], FieldPacket[]] = await pool.query(`
-    SELECT g.id AS game_id, c.course_name,
-    JSON_ARRAYAGG(
-        JSON_OBJECT(
-            'username', u.username,
-            'score', mp.score)
-    ) AS players,
-    COUNT(mp.user_id) AS player_count,
-    CASE
-        WHEN COUNT(mp.user_id) > 1 THEN 'multiplayer'
-        ELSE 'singleplayer'
-    END AS game_type
-    FROM games g
-    JOIN multiplayer_games mp ON mp.game_id = g.id
-    JOIN users u ON u.id = mp.user_id
-    JOIN courses c ON c.id = g.course_id
-    GROUP BY g.id, c.course_name
-    ORDER BY g.id;`);
+        SELECT g.id AS game_id, c.course_name,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'username', u.username,
+                'score', mp.score)
+        ) AS players,
+        COUNT(mp.user_id) AS player_count,
+        CASE
+            WHEN COUNT(mp.user_id) > 1 THEN 'multiplayer'
+            ELSE 'singleplayer'
+        END AS game_type
+        FROM games g
+        JOIN multiplayer_games mp ON mp.game_id = g.id
+        JOIN users u ON u.id = mp.user_id
+        JOIN courses c ON c.id = g.course_id
+        GROUP BY g.id, c.course_name
+        ORDER BY g.id;`);
     return rows;
 };
 
 const getAllUserGames = async (userId: number) : Promise<IGames[]> => {
     const [rows]: [IGames[], FieldPacket[]] = await pool.query(
-    `SELECT g.id AS game_id, c.course_name,
-    JSON_ARRAYAGG( JSON_OBJECT(
-        'username', u.username,
-        'score', mp.score)
-    ) AS players
-    FROM games g
-    JOIN multiplayer_games mp ON mp.game_id = g.id
-    JOIN users u ON u.id = mp.user_id
-    JOIN courses c ON c.id = g.course_id
-    WHERE g.id IN (
-    SELECT game_id FROM multiplayer_games WHERE user_id = ?
-    )
-    GROUP BY g.id, c.course_name;`, [ userId ]);
+        `SELECT g.id AS game_id, c.course_name,
+        JSON_ARRAYAGG( 
+            JSON_OBJECT(
+            'username', u.username,
+            'score', mp.score)
+        ) AS players
+        FROM games g
+        JOIN multiplayer_games mp ON mp.game_id = g.id
+        JOIN users u ON u.id = mp.user_id
+        JOIN courses c ON c.id = g.course_id
+        WHERE g.id IN (
+        SELECT game_id FROM multiplayer_games WHERE user_id = ?
+        )
+        GROUP BY g.id, c.course_name;`, [ userId ]);
     return rows;
 } 
 
-const getGameById = (id: number): IGames | undefined => {
-    const gameId = games.find(gameId => gameId.id === id);
-    return gameId;
+const getGameById = async (id: number): Promise<IGames | undefined> => {
+    const [rows]: [IGames[], FieldPacket[]] = await pool.query(
+        `SELECT g.id as game_id, c.course_name,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+            'username', u.username,
+            'score', mp.score)
+        ) AS players
+        FROM games g
+        JOIN multiplayer_games mp on mp.game_id = g.id
+        JOIN users u ON u.id = mp.user_id
+        JOIN courses c ON c.id = g.course_id
+        WHERE g.id IN (
+        SELECT game_id FROM multiplayer_games WHERE game_id = ?
+        )
+        GROUP BY g.id, c.course_name;`, [ id ])
+    return rows[0];
 };
 
 const createGame = ( datePlayed: Date, score: number, courseId: number, userId: number ): number => {
