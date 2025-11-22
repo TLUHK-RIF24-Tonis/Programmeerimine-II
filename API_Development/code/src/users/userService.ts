@@ -1,5 +1,3 @@
-import { users } from '../data';
-import hashService from '../general/hashService';
 import IUsers, { IUsersData } from './usersInterface';
 import pool from '../database';
 import { FieldPacket, ResultSetHeader } from 'mysql2';

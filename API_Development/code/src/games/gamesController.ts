@@ -78,19 +78,23 @@ const createGame = ( req: Request, res: Response ) => {
     };
 };
 
-const getMyGames = ( req: Request, res: Response ) => {
-    const user = res.locals.user as { id?: number };
-    if ( !user?.id ) {
-        return res.status(401).json({
+const getMyGames = async ( req: Request, res: Response ) => {
+    const userId = res.locals.user.id;
+
+    const getGames = await gamesService.getAllUserGames(userId)
+    if ( !getGames ) {
+        return res.status(400).json({
             success: false,
-            message: `Invalid token`
-        });
-    };
-    const games = gamesService.getAllGames(user.id);
-    return res.status(200).json({
-        success: true,
-        Games: games
-    });
+            message: `You have not played any game yet!`
+        })
+    } else {
+        return res.status(200).json({
+            success: true,
+            message: `All you games loaded:`,
+            getGames
+        })
+    }
+
 };
 
 export default { getGameById, getAllGames, createGame, getMyGames };
