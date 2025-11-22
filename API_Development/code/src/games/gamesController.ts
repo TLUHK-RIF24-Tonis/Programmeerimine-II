@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import gamesService from "./gamesService";
 import userService from "../users/userService";
 
-const getAllGames = ( req: Request, res: Response ) => {
-    const games = gamesService.getAllGames()
+const getAllGames = async ( req: Request, res: Response ) => {
+    const games = await gamesService.getAllGames()
 
     return res.status(200).json ({
         success: true,
-        message: `All your games loaded!`,
+        message: `All games loaded!`,
         games,
     });
 };

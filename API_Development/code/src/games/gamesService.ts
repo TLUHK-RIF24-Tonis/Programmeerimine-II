@@ -3,19 +3,26 @@ import pool from "../database";
 import { games, courses } from "../data";
 import IGames from "./gamesInterface";
 
-const getAllGames = (userId?: number, courseId?: number): IGames[] => {
-    return games.filter(game => {
-        if (userId && courseId) {
-            return game.userId === userId && game.courseId === courseId;
-        }
-        if (userId) {
-            return game.userId === userId;
-        }
-        if (courseId) {
-            return game.courseId === courseId;
-        }
-        return true; // Tagastab kõik mängud?
-    });
+const getAllGames = async () : Promise<IGames[]> => {
+    const [rows]: [IGames[], FieldPacket[]] = await pool.query(`
+    SELECT g.id AS game_id, c.course_name,
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'username', u.username,
+            'score', mp.score)
+    ) AS players,
+    COUNT(mp.user_id) AS player_count,
+    CASE
+        WHEN COUNT(mp.user_id) > 1 THEN 'multiplayer'
+        ELSE 'singleplayer'
+    END AS game_type
+    FROM games g
+    JOIN multiplayer_games mp ON mp.game_id = g.id
+    JOIN users u ON u.id = mp.user_id
+    JOIN courses c ON c.id = g.course_id
+    GROUP BY g.id, c.course_name
+    ORDER BY g.id;`);
+    return rows;
 };
 
 const getAllUserGames = async (userId: number) : Promise<IGames[]> => {
