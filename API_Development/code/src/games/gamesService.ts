@@ -2,6 +2,7 @@ import { FieldPacket } from "mysql2";
 import pool from "../database";
 import { games, courses } from "../data";
 import IGames from "./gamesInterface";
+import { ResultSetHeader } from "mysql2";
 
 const getAllGames = async () : Promise<IGames[]> => {
     const [rows]: [IGames[], FieldPacket[]] = await pool.query(`
@@ -63,18 +64,22 @@ const getGameById = async (id: number): Promise<IGames | undefined> => {
     return rows[0];
 };
 
-const createGame = ( datePlayed: Date, score: number, courseId: number, userId: number ): number => {
-    const id = games[games.length - 1].id + 1;
+interface InputPlayers {
+    userId: number;
+    score: number;
+}
 
-    const game: IGames = {
-        id,
-        userId,
-        courseId,
-        datePlayed,
-        score,
-    };
-    games.push(game);
-    return id;
+const createGame = async ( courseId: number, players: InputPlayers[] ): Promise<number> => {
+    const [game] = await pool.query<ResultSetHeader>( `INSERT INTO games ( course_id ) VALUES (?);`, [courseId]);
+
+    const gameId = game.insertId;
+
+    for (const p of players) {
+        await pool.query(
+            `INSERT INTO multiplayer_games ( game_id, user_id, score ) VALUES (?, ?, ?);`, [gameId, p.userId, p.score]
+        );
+    }
+    return gameId;
 };
 
 // Hetkel ei tööta päris nii nagu mõeldud, selleks vaja luua autentimis süsteem.
