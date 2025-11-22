@@ -11,7 +11,9 @@ const login = async ( req: Request, res: Response ) => {
             message: 'Email / username or password are mandatory to login!'
         })
     }
-    const user = await userService.getUserByIdent(email, username)
+
+    const identifier = email || username
+    const user = await userService.getUserByIdentifier(identifier)
 
     if ( !user ) {
         return res.status(404).json({
@@ -20,18 +22,7 @@ const login = async ( req: Request, res: Response ) => {
         })
     }
 
-    const storeUser = user.id
-    const stored = await userService.findUserPassword(storeUser)
-    const hashedPassword: string | undefined = stored;
-
-    if (!hashedPassword) {
-        return res.status(500).json({
-            success: false,
-            message: 'Stored password not available!'
-        });
-    }
-
-    const match = hashService.compare( password, hashedPassword);
+    const match = hashService.compare( password, user.password );
     if ( !match ) {
         return res.status(400).json({
             success: false,

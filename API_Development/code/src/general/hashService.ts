@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import config from '../config';
 
-const saltRounds = config.saltRounds;
+const saltRounds = Number(config.saltRounds);
 
 const hash = (password: string): string => {
     const hashed = bcrypt.hashSync(password, saltRounds);
