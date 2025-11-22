@@ -13,16 +13,16 @@ const getUserById = async (id: number): Promise<IUsers | undefined> => {
 };
 
 const changeUserStatus = async (id: number): Promise<IUsers> => {
-  await pool.query('UPDATE users SET active = NOT active WHERE id = ?', [id]);
-  const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, username , active FROM users WHERE id = ?', [id]);
+  await pool.query('UPDATE users SET active = NOT active WHERE id = ?;', [id]);
+  const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, username , active FROM users WHERE id = ?;', [id]);
   return rows[0];
 };
 
 const createUser = async ( username:string ,email: string, password_hash: string, role = 'user' ) => {
     const sql = `
     INSERT INTO users ( username, email, password_hash, role )
-    VALUES (?, ?, ?, ?)
-    `;
+    VALUES (?, ?, ?, ?);
+    `
     const [result] = await pool.execute<ResultSetHeader>(sql, [username, email, password_hash, role]);
     return result;
 };

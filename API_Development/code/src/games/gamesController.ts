@@ -31,51 +31,27 @@ const getGameById = async ( req: Request, res: Response ) => {
     });
 };
 
-const createGame = ( req: Request, res: Response ) => {
-    const { datePlayed, score, course } = req.body
+const createGame = async ( req: Request, res: Response ) => {
+    const { courseId, players } = req.body
 
-    const userId = Number(req.body.userId);
-    if ( !userId ) {
-        return res.status(400).json ({
+    if (!courseId)
+        return res.status(400).json({
             success: false,
-            message: 'User ID is missing from creation request!'
+            message: `CourseId is required!`
+    });
+    if (!Array.isArray(players) || players.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: `Players are required!`
         });
     };
 
-    const checkUser = userService.getUserById(userId);
-    if ( !checkUser ) {
-        return res.status(401).json ({
-            success: false,
-            message: 'User is not authorized or does not exist!'
-        })
-    }
+    const createdGame = await gamesService.createGame( courseId, players )
 
-    const foundCourse = gamesService.courses.find(c => c.name === course);
-
-    if (!foundCourse) {
-        return res.status(404).json ({
-            success: false,
-            message: `${course} does not exist, You can add course under course section!`
-        });
-    };
-
-    const courseId = foundCourse.id;
-
-    try {
-        const newGameId = gamesService.createGame(new Date(datePlayed), score, courseId, userId)
-
-        return res.status(201).json ({
-            success: true,
-            message: 'Game successfully created!',
-            gameId: newGameId
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: 'Failed to create game due to server error!',
-            error: error
-        });
-    };
+    return res.status (201).json({
+        success: true,
+        message: `Game created with ID:${createdGame}`
+    })
 };
 
 const getMyGames = async ( req: Request, res: Response ) => {
