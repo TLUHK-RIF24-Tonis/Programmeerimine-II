@@ -12,10 +12,10 @@ const getAllGames = async ( req: Request, res: Response ) => {
     });
 };
 
-const getGameById = ( req: Request, res: Response ) => {
+const getGameById = async ( req: Request, res: Response ) => {
     const id = Number(req.params.id);
 
-    const game = gamesService.getGameById(id);
+    const game = await gamesService.getGameById(id);
 
     if (!game) {
         return res.status(404).json ({
