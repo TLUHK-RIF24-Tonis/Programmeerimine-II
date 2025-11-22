@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import userService from "./userService";
 import { ResultSetHeader } from "mysql2";
+import hashService from "../general/hashService";
 
 const getAllUsers = async ( req: Request, res: Response ) => {
     const users = await userService.getAllUsers();
@@ -61,24 +62,26 @@ const createUser = async ( req: Request, res: Response ) => {
     if ( !username || !email || !password ) {
         return res.status(400).json({
             success: false,
-            message: `login details are missing!`
+            message: `Details are missing for account creation!`
         });
     };
 
-    const checkIdent = await userService.getUserByIdent(username, email);
+    const identifyUser = await userService.getUserByIdentifier( email || username);
 
-    if ((checkIdent)) {
+    if ((identifyUser)) {
         return res.status(400).json({
             success: false,
             message: 'User already exist!',
         });
     };
 
+    const hashedPassword = hashService.hash(password);
+
     try {
-    const createUser = await userService.createUser(username, email, password);
+    const createdUser = await userService.createUser(username, email, hashedPassword);
     return res.status(201).json({
         success: true,
-        message: `User created with id: ${createUser.insertId}`,
+        message: `User created with id: ${createdUser.insertId}`,
     })} catch ( err: any) {
         if ( err.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({

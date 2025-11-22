@@ -20,31 +20,22 @@ const changeUserStatus = async (id: number): Promise<IUsers> => {
   return rows[0];
 };
 
-const createUser = async ( username:string ,email: string, password: string, role = 'user' ) => {
+const createUser = async ( username:string ,email: string, password_hash: string, role = 'user' ) => {
     const sql = `
     INSERT INTO users ( username, email, password_hash, role )
     VALUES (?, ?, ?, ?)
     `;
-    const [result] = await pool.execute<ResultSetHeader>(sql, [username, email, password, role]);
+    const [result] = await pool.execute<ResultSetHeader>(sql, [username, email, password_hash, role]);
     return result;
 };
 
-const getUserByIdent = async ( email: string, username: string ): Promise<IUsers | undefined> => {
+const getUserByIdentifier = async ( identifier: string ): Promise<IUsers | undefined> => {
     const [rows]: [IUsers[], FieldPacket[]] = await pool.query(
         `SELECT id, email, username, role, created_at as createdAt,
-        active as Active FROM users WHERE email = ? OR username = ?;`, [email, username]);
+        active as Active, password_hash as password
+        FROM users WHERE email = ? OR username = ? LIMIT 1;`, [identifier, identifier]);
     return rows[0];
 };
 
-const findUserByUsername = async ( username: string): Promise<IUsers | undefined> => {
-    const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, email, username, role, created_at as createdAt, active FROM users WHERE username = ?;', [username]);
-    return rows[0];
-};
 
-const findUserPassword = async ( id: number ): Promise<string | undefined> => {
-    const [rows]: [any[], FieldPacket[]] = await pool.execute('SELECT password_hash FROM users WHERE id = ?;', [id]);
-    return rows[0]?.password_hash;
-}
-
-
-export default { getUserById, changeUserStatus, createUser, getUserByIdent, findUserByUsername, getAllUsers, findUserPassword };
+export default { getUserById, changeUserStatus, createUser, getUserByIdentifier, getAllUsers };
