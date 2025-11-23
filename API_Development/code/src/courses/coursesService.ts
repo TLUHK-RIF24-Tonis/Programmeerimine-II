@@ -1,9 +1,12 @@
 import { courses } from "../data";
 import ICourses from "./coursesInterface";
+import pool from "../database";
+import { FieldPacket } from "mysql2";
 
-const getCourseById = (id: number): ICourses | undefined => {
-    const course = courses.find(course => course.id === id);
-    return course
+const getCourseById = async (id: number): Promise<ICourses | undefined> => {
+    const [course]: [ICourses[], FieldPacket[]] = await pool.query(
+        `SELECT id, course_name, location, holes, par FROM courses where id = ?;`, [id])
+    return course[0];
 };
 
 const getAllCourses = () : ICourses[] => {
