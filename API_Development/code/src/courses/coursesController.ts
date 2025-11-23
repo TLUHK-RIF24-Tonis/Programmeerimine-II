@@ -12,11 +12,11 @@ return res.status(200).json({
 });
 };
 
-const getCourseById = (req: Request, res: Response) => {
+const getCourseById = async (req: Request, res: Response) => {
     
     const id = Number(req.params.id);
 
-    const course = coursesService.getCourseById(id);
+    const course = await coursesService.getCourseById(id);
 
     if (!course) {
         return res.status(404).json ({
