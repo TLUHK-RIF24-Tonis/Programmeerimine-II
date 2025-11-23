@@ -7,7 +7,7 @@ const courses = await coursesService.getAllCourses();
 
 if (!courses) {
     return res.status(200).json({
-        success: false,
+        success: true,
         message: 'No courses found!',
         courses: []
     })

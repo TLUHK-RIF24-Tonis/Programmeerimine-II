@@ -1,10 +1,30 @@
 import { IDiscs } from "./discsInterface";
 import { discs, userDiscs, users } from "../data";
+import { FieldPacket } from "mysql2";
+import pool from "../database";
 
-const getUserDiscs = ( userId: number): IDiscs[] => {
-
-    const ownedDiscIds = userDiscs.filter(ud => ud.userId === userId).map(ud => ud.discId);
-    return discs.filter(disc => ownedDiscIds.includes(disc.id));
+const getUserDiscs = async ( userId: number): Promise<IDiscs[] | undefined> => {
+    const [userDiscs]: [IDiscs[], FieldPacket[]] = await pool.query(`
+        SELECT u.id AS user_id,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+             'disc_id', d.id,
+             'brand', d.brand,
+             'model', d.model,
+             'disc_type', d.disc_type,
+             'speed', d.speed,
+             'glide', d.glide,
+             'turn', d.turn,
+             'fade', d.fade
+            )
+        ) AS discs
+        FROM users u
+        JOIN user_discs ud ON ud.user_id = u.id
+        JOIN discs d ON d.id = ud.disc_id
+        WHERE u.id = ?
+        GROUP BY u.id;
+        `, [ userId ])
+    return userDiscs;
 };
 
 const userOwnDisc = ( userId: number, discId: number): boolean => {

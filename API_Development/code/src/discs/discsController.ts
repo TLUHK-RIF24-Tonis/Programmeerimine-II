@@ -32,15 +32,16 @@ const getDiscById = (req: Request, res: Response) => {
     };
 };
 
-const getUserDiscs = (req: Request, res: Response) => {
+const getUserDiscs = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
-    const userDiscs = discsService.getUserDiscs(id);
+    const userDiscs = await discsService.getUserDiscs(id);
 
-    if (userDiscs.length === 0) {
-        return res.status(404).json ({
-            success: false,
-            message: 'You dont have any discs!'
+    if (!userDiscs) {
+        return res.status(200).json ({
+            success: true,
+            message: 'You dont have any discs!',
+            Discs: []
         });
     } else {
         return res.status(200).json ({
