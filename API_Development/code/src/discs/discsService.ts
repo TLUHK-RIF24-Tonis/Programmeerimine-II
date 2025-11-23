@@ -1,6 +1,6 @@
 import { IDiscs } from "./discsInterface";
 import { discs, userDiscs, users } from "../data";
-import { FieldPacket } from "mysql2";
+import { FieldPacket, RowDataPacket } from "mysql2";
 import pool from "../database";
 
 const getUserDiscs = async ( userId: number): Promise<IDiscs[] | undefined> => {
@@ -27,8 +27,12 @@ const getUserDiscs = async ( userId: number): Promise<IDiscs[] | undefined> => {
     return userDiscs;
 };
 
-const userOwnDisc = ( userId: number, discId: number): boolean => {
-    return userDiscs.some(ud => ud.userId === userId && ud.discId == discId);
+const userOwnDisc = async ( userId: number, discId: number): Promise<boolean> => {
+    const [isDisc] = await pool.query<RowDataPacket[]>(`
+        SELECT 1 FROM user_discs WHERE user_id = ? AND disc_id = ? LIMIT 1
+        `, [ userId, discId])
+
+        return isDisc.length > 0;
 }
 
 const createDisc = ( brand: string, model: string,type: IDiscs["type"] , speed: number, glide: number, turn: number, fade: number ) => {
