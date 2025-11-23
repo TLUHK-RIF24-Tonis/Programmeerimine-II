@@ -62,27 +62,30 @@ const getUserDiscs = async (req: Request, res: Response) => {
 
 const userHaveDisc = (req: Request, res: Response) => {
     const { userId, discId } = req.body
-    const isDisc = discsService.getDiscById(discId);
-    const isUser = userService.getUserById(userId)
 
-    if ( isDisc && isUser ) {
-        return res.status(200).json ({
-            success: true,
-            message: `Disc: ${discId} belongs to ${userId}`,
-            isDisc
-        });
-    }
-    if ( isDisc && !isUser)
-        return res.status(404).json({
+    const isDisc = discsService.getDiscById(discId);
+    const isUser = userService.getUserById(userId);
+
+    if (!isDisc || !isUser) {
+        return res.status(400).json ({
             success: false,
-            message: 'User does not have this disc!'
+            message: 'Missing user or disc, please check if both exists!'
         })
-    if ( !isDisc && isUser )
+    }
+
+    const hasDisc = discsService.userOwnDisc(userId, discId)
+
+    if (!hasDisc) {
         return res.status(404).json ({
             success: false,
-            message: 'Disc does not exist!'
+            message: `User id: ${userId} does not own this disc.`
         })
-};
+    }
+    return res.status(200).json ({
+        success: true,
+        message: `User id: ${userId} has this disc.`
+    }) 
+}
 
 const createDisc = ( req: Request, res: Response ) => {
     const { brand, model, type, speed, glide, turn, fade } = req.body
