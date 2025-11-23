@@ -20,19 +20,19 @@ const getAllDiscs = async (req: Request, res: Response) => {
     });
 };
 
-const getDiscById = (req: Request, res: Response) => {
+const getDiscById = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
-    const disc = discsService.getDiscById(id);
+    const foundDisc = await discsService.getDiscById(id);
 
-    if (disc) {   
+    if (foundDisc) {   
         return res.status(200).json ({
         success: true,
         message: `Disc Found!`,
-        disc,
+        foundDisc,
     })};
 
-    if(!disc) {
+    if(!foundDisc) {
         return res.status (404).json ({
             success: false,
             message: `Disc not found!`
