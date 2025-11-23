@@ -5,11 +5,13 @@ import { FieldPacket } from "mysql2";
 
 const getCourseById = async (id: number): Promise<ICourses | undefined> => {
     const [course]: [ICourses[], FieldPacket[]] = await pool.query(
-        `SELECT id, course_name, location, holes, par FROM courses where id = ?;`, [id])
+        `SELECT id, course_name as name, location, holes, par FROM courses where id = ?;`, [id])
     return course[0];
 };
 
-const getAllCourses = () : ICourses[] => {
+const getAllCourses = async () : Promise<ICourses[]> => {
+    const [courses]: [ICourses[], FieldPacket[]] = await pool.query(
+        `SELECT id, course_name as name, location, holes, par, created_at as createdAt FROM courses;`)
     return courses;
 };
 
