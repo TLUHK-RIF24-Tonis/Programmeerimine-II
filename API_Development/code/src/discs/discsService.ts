@@ -53,14 +53,17 @@ const createDisc = ( brand: string, model: string,type: IDiscs["type"] , speed: 
     return disc;
 };
 
-const getDiscById = (id: number): IDiscs | undefined => {
-  return discs.find(disc => disc.id === id);
+const getDiscById = async (id: number): Promise<IDiscs | undefined> => {
+  const [disc]: [IDiscs[], FieldPacket[]] = await pool.query(`
+    SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at as added FROM discs WHERE id = ?;
+    `, [id])
+    return disc[0];
 };
 
 const getAllDiscs = async (): Promise<IDiscs[]> => {
     const [discs]: [IDiscs[], FieldPacket[]] = await pool.query(`
         SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at as added FROM discs;
-        `);
+        `)
     return discs;
 };
 
