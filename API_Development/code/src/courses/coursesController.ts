@@ -1,9 +1,17 @@
 import { Request, Response } from 'express';
 import coursesService from './coursesService';
 
-const getAllCourses = (req: Request, res: Response) => {
+const getAllCourses = async (req: Request, res: Response) => {
 
-const courses = coursesService.getAllCourses();
+const courses = await coursesService.getAllCourses();
+
+if (!courses) {
+    return res.status(200).json({
+        success: false,
+        message: 'No courses found!',
+        courses: []
+    })
+};
 
 return res.status(200).json({
     success: true,
