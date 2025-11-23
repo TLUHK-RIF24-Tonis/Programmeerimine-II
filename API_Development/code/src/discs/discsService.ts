@@ -57,8 +57,11 @@ const getDiscById = (id: number): IDiscs | undefined => {
   return discs.find(disc => disc.id === id);
 };
 
-const getAllDiscs = (): IDiscs [] => {
-    return discs
+const getAllDiscs = async (): Promise<IDiscs[]> => {
+    const [discs]: [IDiscs[], FieldPacket[]] = await pool.query(`
+        SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at as added FROM discs;
+        `);
+    return discs;
 };
 
 export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc };

@@ -2,12 +2,20 @@ import { Request, Response } from "express";
 import discsService from "./discsService";
 import userService from "../users/userService";
 
-const getAllDiscs = (req: Request, res: Response) => {
-    const discs = discsService.getAllDiscs();
+const getAllDiscs = async (req: Request, res: Response) => {
+    const discs = await discsService.getAllDiscs();
+
+    if ( !discs ) {
+        return res.status(204).json({
+            success: true,
+            message: `There are no discs!`,
+            discs: []
+        })
+    }
 
     return res.status(200).json ({
         success: true,
-        message: `All player discs loaded!`,
+        message: `All discs loaded!`,
         discs,
     });
 };
