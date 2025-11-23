@@ -1,6 +1,6 @@
 import { IDiscs } from "./discsInterface";
 import { discs, userDiscs, users } from "../data";
-import { FieldPacket, RowDataPacket } from "mysql2";
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../database";
 
 const getUserDiscs = async ( userId: number): Promise<IDiscs[] | undefined> => {
@@ -35,26 +35,33 @@ const userOwnDisc = async ( userId: number, discId: number): Promise<boolean> =>
         return isDisc.length > 0;
 }
 
-const createDisc = ( brand: string, model: string,type: IDiscs["type"] , speed: number, glide: number, turn: number, fade: number ) => {
-    const id = discs[discs.length - 1].id + 1;
+const createDisc = async ( brand: string, model: string,type: IDiscs["type"] , speed: number, glide: number, turn: number, fade: number ): Promise<{ success: boolean, message: string, discId?: number }> => {
 
-    const allDiscs = getAllDiscs();
-    const exist = allDiscs.some(d => d.brand === brand && d.model === model);
+    const [exists] = await pool.query<RowDataPacket[]>(`
+    SELECT id
+    FROM discs
+    WHERE brand = ? AND model = ? AND disc_type = ?
+    LIMIT 1;
+    `, [brand, model, type]);
 
-    if ( exist ) return null;
+    if ( exists.length > 0 ) {
+        return {
+            success: false,
+            message: 'This disc already exists!'
+        };
+    }
 
-    const disc: IDiscs | null = {
-        id,
-        brand,
-        model,
-        type,
-        speed,
-        glide,
-        turn,
-        fade,
+    const [created] = await pool.query<ResultSetHeader>(`
+        INSERT INTO discs
+        (brand, model, disc_type, speed, glide, turn, fade)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        `, [brand, model, type, speed, glide , turn, fade])
+
+    return {
+        success: true,
+        message: "Disc created",
+        discId: created.insertId,
     };
-    discs.push(disc);
-    return disc;
 };
 
 const getDiscById = async (id: number): Promise<IDiscs | undefined> => {

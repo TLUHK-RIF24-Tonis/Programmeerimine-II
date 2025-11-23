@@ -87,10 +87,9 @@ const userHaveDisc = (req: Request, res: Response) => {
     }) 
 }
 
-const createDisc = ( req: Request, res: Response ) => {
+const createDisc = async ( req: Request, res: Response ) => {
     const { brand, model, type, speed, glide, turn, fade } = req.body
 
-    const disc = discsService.createDisc( brand, model, type, speed, glide,turn ,fade )
     if ( !brand || !model || !type ) {
         return res.status(400).json ({
             success: false,
@@ -98,21 +97,27 @@ const createDisc = ( req: Request, res: Response ) => {
         })
     }
 
-    if ( speed === "" || glide === "" || turn === "" || fade === "" ) {
+    if ( speed == null || glide == null || turn == null || fade == null ) {
         return res.status(400).json ({
             success: false,
-            message: 'Please insert flight numbers before adding disc!'
+            message: 'Please insert all flight numbers ( speed, glide, turn, fade ) before adding disc!'
         })
     }
-    if ( !disc ) {
-        return res.status(404).json ({
+
+    const result = await discsService.createDisc(
+        brand, model, type, speed, glide, turn, fade
+    );
+    
+    if ( !result.success ) {
+        return res.status(409).json ({
             success: false,
-            message: 'Disc already exist!'
+            message: result.message
         })
     } else {
         return res.status(201).json ({
             success: true,
-            message: 'Disc added!',
+            message: 'Disc created!',
+            discId: result.discId,
             brand,
             model,
             type,
@@ -120,8 +125,8 @@ const createDisc = ( req: Request, res: Response ) => {
             glide,
             turn,
             fade
-        })
-    }
+        });
+    };
 };
 
 export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc };
