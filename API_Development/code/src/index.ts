@@ -30,7 +30,8 @@ app.get('/', (req, res) => {
             "GET /games/admin/:id": 'Get game by ID (Admin)',
             "POST /games/add": 'Add game',
             "DELETE /games/:id": 'For admin to soft-delte game',
-            "PATCH /games/:id/leave": 'For user to remove self from game'
+            "PATCH /games/:id/leave": 'For user to remove self from game',
+            "PATCH /games/:id": 'To update game data'
             },
             DISCS:{
             "GET /discs": 'Get all discs',

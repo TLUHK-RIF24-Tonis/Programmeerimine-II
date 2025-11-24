@@ -66,7 +66,8 @@ const createGame = async ( req: Request, res: Response ) => {
         });
     };
 
-    const createdGame = await gamesService.createGame( courseId, players )
+    const creatorId = res.locals.user.id;
+    const createdGame = await gamesService.createGame( courseId, players, creatorId )
 
     return res.status (201).json({
         success: true,
@@ -128,6 +129,66 @@ const removeFromGame = async ( req: Request, res: Response ) => {
         success: true,
         message: `You have been removed from game ${gameId}`
     })
-}
+};
 
-export default { getGameById, getAllGames, createGame, getMyGames, deleteGame, removeFromGame, getUserGameById };
+const updateGame = async ( req: Request, res: Response ) => {
+    const activeUser = Number(res.locals.user.id);
+    const gameId = Number(req.params.id);
+    const { playerId, score, datePlayed } = req.body;
+
+    if ( 
+        playerId === undefined &&
+        score === undefined
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: `Atleast one field must be provided`
+        })
+    }
+
+    const parsedPlayerId = Number(playerId);
+    if ( Number.isNaN(parsedPlayerId) ) {
+        return res.status(400).json({
+            success: false,
+            message: `PlayerId must be a number`
+        });
+    }
+
+    const existingGame = await gamesService.getGameMeta(gameId);
+
+    if ( !existingGame ) {
+        return res.status(404).json({
+            success: false,
+            message: `Game not found!`
+        });
+    }
+
+    const isCreator = Number(existingGame.created_by) === activeUser;
+    const isSelf = parsedPlayerId === activeUser;
+
+    if ( !isCreator && !isSelf ) {
+        return res.status(403).json({
+            success: false,
+            message: `You are not allowed to modify this game`
+        });
+    }
+
+    const update = await gamesService.updatePlayerScore( gameId, parsedPlayerId, score);
+
+    if ( !update ) {
+        return res.status(403).json({
+            success: false,
+            message: `Incorrect Player ID or Game ID!`
+        });
+    }
+
+    const updatedGame = await gamesService.getGameById( gameId );
+
+    return res.status(200).json({
+        success: true,
+        message: `Game updated`,
+        updatedGame
+    });
+};
+
+export default { getGameById, getAllGames, createGame, getMyGames, deleteGame, removeFromGame, getUserGameById, updateGame };
