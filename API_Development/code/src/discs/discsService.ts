@@ -64,18 +64,31 @@ const createDisc = async ( brand: string, model: string,type: IDiscs["type"] , s
     };
 };
 
+const deleteDisc = async ( id: number ): Promise<boolean> => {
+    const [result]: [ ResultSetHeader, FieldPacket[] ] = await pool.query(`
+        UPDATE discs
+            SET deleted_at = CURRENT_TIMESTAMP,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+                AND deleted_at IS NULL
+        `, [id])
+        return result.affectedRows > 0;
+}
+
 const getDiscById = async (id: number): Promise<IDiscs | undefined> => {
-  const [disc]: [IDiscs[], FieldPacket[]] = await pool.query(`
-    SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at as added FROM discs WHERE id = ?;
+    const [disc]: [IDiscs[], FieldPacket[]] = await pool.query(`
+        SELECT id, brand, model, disc_type as type, speed, glide, turn, fade,
+        created_at as added FROM discs WHERE id = ? AND deleted_at IS NULL;
     `, [id])
     return disc[0];
 };
 
 const getAllDiscs = async (): Promise<IDiscs[]> => {
     const [discs]: [IDiscs[], FieldPacket[]] = await pool.query(`
-        SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at as added FROM discs;
-        `)
+        SELECT id, brand, model, disc_type as type, speed, glide, turn, fade,
+        created_at as added FROM discs AND deleted_at IS NULL;
+    `)
     return discs;
 };
 
-export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc };
+export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc, deleteDisc };

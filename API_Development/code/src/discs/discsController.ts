@@ -129,4 +129,19 @@ const createDisc = async ( req: Request, res: Response ) => {
     };
 };
 
-export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc };
+const deleteDisc = async ( req: Request, res: Response ) => {
+    const discId = Number( req.params.id );
+
+    const deleted = await discsService.deleteDisc(discId)
+
+    if ( !deleted ) {
+        return res.status(404).json({
+            success: false,
+            message: `Disc with ID: ${discId} not found`
+        });
+    }
+
+    return res.status(204).send();
+};
+
+export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc, deleteDisc };
