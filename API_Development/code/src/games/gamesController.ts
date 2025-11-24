@@ -84,10 +84,30 @@ const deleteGame = async ( req: Request, res: Response ) => {
         });
     }
     
-    return res.status(204).send().json({
+    return res.status(200).json({
         success: true,
-        message: `Game with id: ${id} deleted!`
-    });
+        message: `Game with id: ${id} marked as deleted!`
+    })
+
 };
 
-export default { getGameById, getAllGames, createGame, getMyGames, deleteGame };
+const removeFromGame = async ( req: Request, res: Response ) => {
+    const userId = res.locals.user.id;
+    const gameId = Number( req.params.id );
+
+    const remove = await gamesService.removeUserFromGame( gameId, userId );
+
+    if ( !remove ) {
+        return res.status(404).json({
+            success: false,
+            message: `Game with id: ${gameId} does not exist or user is not part of the game!`
+        })
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: `You have been removed from game ${gameId}`
+    })
+}
+
+export default { getGameById, getAllGames, createGame, getMyGames, deleteGame, removeFromGame };
