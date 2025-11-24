@@ -6,6 +6,8 @@ interface IGames extends RowDataPacket {
     courseId: number;
     datePlayed: Date;
     score: number;
+    createdAt?: Date;
+    updatedAt?: Date;
 };
 
 export default IGames;
