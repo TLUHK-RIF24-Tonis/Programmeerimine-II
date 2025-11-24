@@ -81,6 +81,8 @@ CREATE TABLE multiplayer_games (
     game_id INT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     score INT NOT NULL,
+    user_status ENUM('active', 'removed') NOT NULL DEFAULT 'active',
+    left_at TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;

@@ -9,6 +9,6 @@ router.get('/myGames', gamesController.getMyGames);
 router.get('/:id', gamesController.getGameById);
 router.post('/add', gamesController.createGame);
 router.delete('/:id', isAdmin, gamesController.deleteGame);
-router.delete('/myGames/:id', gamesController.removeGame);
+router.patch('/myGames/:id/leave', gamesController.removeFromGame);
 
 export default router;
