@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import discsService from "./discsService";
 import userService from "../users/userService";
+import { IDiscs } from "./discsInterface";
 
 const getAllDiscs = async (req: Request, res: Response) => {
     const discs = await discsService.getAllDiscs();
@@ -44,6 +45,26 @@ const getUserDiscs = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
     const userDiscs = await discsService.getUserDiscs(id);
+
+    if (!userDiscs) {
+        return res.status(200).json ({
+            success: true,
+            message: `This user with ID: ${id} does not own any discs!`,
+            Discs: []
+        });
+    } else {
+        return res.status(200).json ({
+            success: true,
+            message: 'All discs loaded',
+            userDiscs
+        });
+    };
+};
+
+const getMyDiscs = async (req: Request, res: Response) => {
+    const userId = res.locals.user.id;
+
+    const userDiscs = await discsService.getUserDiscs(userId);
 
     if (!userDiscs) {
         return res.status(200).json ({
@@ -144,4 +165,93 @@ const deleteDisc = async ( req: Request, res: Response ) => {
     return res.status(204).send();
 };
 
-export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc, deleteDisc };
+const updateDisc = async ( req: Request, res: Response ) => {
+    const id = Number(req.params.id);
+    const { brand, model, disc_type, speed, glide, turn, fade } = req.body;
+
+    if (
+        brand === undefined &&
+        model === undefined &&
+        disc_type === undefined &&
+        speed === undefined &&
+        glide === undefined &&
+        turn === undefined &&
+        fade === undefined
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: `Atleast one field must be provided!`
+        });
+    }
+
+    const updates: Partial<{
+        brand: string;
+        model: string;
+        disc_type: string;
+        speed: number;
+        glide: number;
+        turn: number;
+        fade: number;
+    }> = {};
+
+    if ( brand !== undefined ) updates.brand = brand;
+    if ( model !== undefined ) updates.model = model;
+    if ( disc_type !== undefined ) updates.disc_type = disc_type;
+      if ( speed !== undefined ) {
+    const parsedSpeed = Number(speed);
+    if (Number.isNaN(parsedSpeed)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Speed must be a number',
+      });
+    }
+    updates.speed = parsedSpeed;
+  }
+    if ( glide !== undefined ) {
+    const parsedGlide = Number(glide);
+    if (Number.isNaN(parsedGlide)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Glide must be a number',
+      });
+    }
+    updates.glide = parsedGlide;
+  }
+    if ( turn !== undefined ) {
+    const parsedTurn = Number(turn);
+    if (Number.isNaN(parsedTurn)) {
+      return res.status(400).json({
+        success: false,
+        message: 'turn must be a number',
+      });
+    }
+    updates.turn = parsedTurn;
+  }
+    if ( fade !== undefined ) {
+    const parsedFade = Number(fade);
+    if (Number.isNaN(parsedFade)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Fade must be a number',
+      });
+    }
+    updates.fade = parsedFade;
+  }
+
+  const update = await discsService.updateDisc( id, updates);
+
+  if ( !update ) {
+    res.status(404).json({
+        success: false,
+        message: `Disc with ID: ${id} not found!`
+    })
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: `Disc updated`,
+    disc: update
+  });
+};
+
+export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc, deleteDisc, getMyDiscs, updateDisc };

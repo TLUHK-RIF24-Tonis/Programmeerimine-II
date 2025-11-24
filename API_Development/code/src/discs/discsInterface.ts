@@ -8,7 +8,9 @@ interface IDiscs extends RowDataPacket {
    speed: number,
    glide: number,
    turn: number,
-   fade: number;
+   fade: number,
+   created_at?: Date,
+   updated_at?: Date;
 };
 interface IUserDiscs {
     userId: number,
