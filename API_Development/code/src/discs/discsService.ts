@@ -73,7 +73,54 @@ const deleteDisc = async ( id: number ): Promise<boolean> => {
                 AND deleted_at IS NULL
         `, [id])
         return result.affectedRows > 0;
-}
+};
+
+const updateDisc = async ( id: number, updates: Partial<Omit<IDiscs, 'id' | 'created_at' | 'updated_at'>> ): Promise<IDiscs | undefined> => {
+    
+    if (
+        updates.brand === undefined &&
+        updates.model === undefined &&
+        updates.disc_type === undefined &&
+        updates.speed === undefined &&
+        updates.glide === undefined &&
+        updates.turn === undefined &&
+        updates.fade === undefined
+    ) {
+        return getDiscById(id);
+    }
+
+    const params: ( string | number | null )[] = [
+        updates.brand ?? null,
+        updates.model ?? null,
+        updates.disc_type ?? null,
+        updates.speed ?? null,
+        updates.glide ?? null,
+        updates.turn ?? null,
+        updates.fade ?? null,
+        id
+    ];
+    
+    const [disc]: [ ResultSetHeader, FieldPacket[] ] =
+    await pool.query<ResultSetHeader>(`
+        UPDATE discs
+            SET brand = COALESCE(?, brand),
+                model = COALESCE(?, model),
+                disc_type = COALESCE(?, disc_type),
+                speed = COALESCE(?, speed),
+                glide = COALESCE(?, glide),
+                turn = COALESCE(?, turn),
+                fade = COALESCE(?, fade),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+                AND deleted_at IS NULL;
+        `, params);
+
+    if ( disc.affectedRows === 0 ) {
+        return undefined;
+    }
+
+    return getDiscById(id);
+};
 
 const getDiscById = async (id: number): Promise<IDiscs | undefined> => {
     const [disc]: [IDiscs[], FieldPacket[]] = await pool.query(`
@@ -86,9 +133,9 @@ const getDiscById = async (id: number): Promise<IDiscs | undefined> => {
 const getAllDiscs = async (): Promise<IDiscs[]> => {
     const [discs]: [IDiscs[], FieldPacket[]] = await pool.query(`
         SELECT id, brand, model, disc_type as type, speed, glide, turn, fade,
-        created_at as added FROM discs AND deleted_at IS NULL;
+        created_at as added FROM discs WHERE deleted_at IS NULL;
     `)
     return discs;
 };
 
-export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc, deleteDisc };
+export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc, deleteDisc, updateDisc };
