@@ -1,6 +1,5 @@
 import { FieldPacket } from "mysql2";
 import pool from "../database";
-import { games, courses } from "../data";
 import IGames from "./gamesInterface";
 import { ResultSetHeader } from "mysql2";
 
@@ -82,7 +81,18 @@ const createGame = async ( courseId: number, players: InputPlayers[] ): Promise<
     return gameId;
 };
 
-// Hetkel ei tööta päris nii nagu mõeldud, selleks vaja luua autentimis süsteem.
-// Vaja oleks unikaalset ID-d või tokeni millega võrrelda.
+const deleteGame = async ( id: number ): Promise<Boolean> => {
+    const [deleted]: [ResultSetHeader, FieldPacket[]] = await pool.query<ResultSetHeader>(`
+        UPDATE games
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND deleted_at IS NULL;
+        `, [id]);
 
-export default { getAllGames, getGameById, createGame, getAllUserGames };
+    return deleted.affectedRows > 0;
+};
+
+const removeUserFromGame = async ( id: number ): Promise<Boolean> => {
+    const [remove]: [ResultSetHeader, FieldPacket[]]
+}
+
+export default { getAllGames, getGameById, createGame, getAllUserGames, deleteGame };

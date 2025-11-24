@@ -70,7 +70,24 @@ const getMyGames = async ( req: Request, res: Response ) => {
             getGames
         })
     }
-
 };
 
-export default { getGameById, getAllGames, createGame, getMyGames };
+const deleteGame = async ( req: Request, res: Response ) => {
+    const id = Number( req.params.id );
+
+    const deleted = await gamesService.deleteGame(id);
+
+    if ( !deleted ) {
+        return res.status(404).json({
+            success: false,
+            message: `Game with id: ${id} not found!`
+        });
+    }
+    
+    return res.status(204).send().json({
+        success: true,
+        message: `Game with id: ${id} deleted!`
+    });
+};
+
+export default { getGameById, getAllGames, createGame, getMyGames, deleteGame };
