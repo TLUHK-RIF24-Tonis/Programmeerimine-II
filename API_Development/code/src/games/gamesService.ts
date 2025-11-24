@@ -65,6 +65,26 @@ const getGameById = async (id: number): Promise<IGames | undefined> => {
     return rows[0];
 };
 
+const getUserGameById = async ( gameId: number, userId: number ): Promise<IGames | undefined> => {
+    const [userGame]: [IGames[], FieldPacket[]] = await pool.query(`
+        SELECT g.id AS game_id, c.course_name,
+        JSON_ARRAYAGG( 
+            JSON_OBJECT(
+            'username', u.username,
+            'score', mp.score)
+        ) AS players
+        FROM games g
+        JOIN multiplayer_games mp ON mp.game_id = g.id AND mp.left_at IS NULL
+        JOIN users u ON u.id = mp.user_id
+        JOIN courses c ON c.id = g.course_id
+        WHERE g.id = ? AND g.id IN (
+        SELECT game_id FROM multiplayer_games WHERE user_id = ? AND left_at IS NULL
+        )
+        GROUP BY g.id, c.course_name;`, [ gameId, userId ]);
+
+    return userGame[0];
+}
+
 interface InputPlayers {
     userId: number;
     score: number;
@@ -103,4 +123,4 @@ const removeUserFromGame = async ( gameId: number, userId: number ): Promise<Boo
     return remove.affectedRows > 0;
 };
 
-export default { getAllGames, getGameById, createGame, getAllUserGames, deleteGame, removeUserFromGame };
+export default { getAllGames, getGameById, createGame, getAllUserGames, deleteGame, removeUserFromGame, getUserGameById };

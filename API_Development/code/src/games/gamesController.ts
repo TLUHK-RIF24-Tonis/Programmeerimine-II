@@ -31,6 +31,26 @@ const getGameById = async ( req: Request, res: Response ) => {
     });
 };
 
+const getUserGameById = async ( req: Request, res: Response ) => {
+    const userId = res.locals.user.id;
+    const gameId = Number ( req.params.id );
+
+    const game = await gamesService.getUserGameById( gameId, userId );
+
+    if ( !game ) {
+        return res.status(404).json ({
+            success: false,
+            message: `You are not part of this game id: ${gameId}!`
+        })
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: `Game found!`,
+        game
+    })
+}
+
 const createGame = async ( req: Request, res: Response ) => {
     const { courseId, players } = req.body
 
@@ -110,4 +130,4 @@ const removeFromGame = async ( req: Request, res: Response ) => {
     })
 }
 
-export default { getGameById, getAllGames, createGame, getMyGames, deleteGame, removeFromGame };
+export default { getGameById, getAllGames, createGame, getMyGames, deleteGame, removeFromGame, getUserGameById };
