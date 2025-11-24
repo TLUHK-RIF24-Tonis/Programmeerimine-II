@@ -74,9 +74,10 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 |:--------|:----------|:-----------|:-----------|
 | **GET** | `/discs` | Saa kõik kettad |Sisse logitud|
 | **GET** | `/discs/:id` | Saa ketas id alusel |Sisse logitud|
-| **POST** | `/discs` | Lisa uus ketas |Sisse logitud|
-| **GET** | `/discs/user/:id` | Saa kettad mis kuuluvad kindlale kasutajale |Sisse logitud|
-| **POST** | `/discs/user/disc/check` | Vaata kas kasutajal (:id) on selline ketas (:id) |Admin|
+| **POST** | `/discs` | Lisa uus ketas |Admin|
+| **GET** | `/discs/user/:id` | Saa kettad mis kuuluvad kindlale kasutajale |Admin|
+| **GET** | `/discs/me` | Kasutaja kettad |Sisse logitud|
+| **GET** | `/discs/user/disc/check` | Vaata kas kasutajal (:id) on selline ketas (:id) |Admin|
 
 ---
 
