@@ -48,8 +48,10 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 | Meetod | Endpoint | Kirjeldus | Ligipääs |
 |:--------|:----------|:-----------|:-----------|
 | **GET** | `/users` | Saa kõik kasutajad | Admin |
-| **GET** | `/users/:id` | Saa kasutaja id alusel | Sisse logitud |
-| **POST** | `/users/:id/status` | Muuda kastuaja aktiivsus staatust | Admin |
+| **GET** | `/users/:id` | Saa kasutaja id alusel | Admin |
+| **GET** | `/users/me` | Saa sisse logitud kasutaja andmed | Sisse logitud |
+| **PATCH** | `/users/:id/status` | Muuda kastuaja aktiivsus staatust | Admin |
+| **DELETE** | `/users/:id` | Kasutaja soft-delete | Admin |
 
 ---
 

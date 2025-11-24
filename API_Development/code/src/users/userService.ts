@@ -13,7 +13,7 @@ const getUserById = async (id: number): Promise<IUsers | undefined> => {
 };
 
 const changeUserStatus = async (id: number): Promise<IUsers> => {
-  await pool.query('UPDATE users SET active = NOT active WHERE id = ?;', [id]);
+  await pool.query('UPDATE users SET active = NOT active, updated_at = CURRENT_TIMESTAMP WHERE id = ?;', [id]);
   const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, username , active FROM users WHERE id = ?;', [id]);
   return rows[0];
 };
@@ -35,5 +35,17 @@ const getUserByIdentifier = async ( identifier: string ): Promise<IUsers | undef
     return rows[0];
 };
 
+const deleteUser = async ( id: number ): Promise<boolean> => {
+    const [deleted]: [ ResultSetHeader, FieldPacket[] ] =
+        await pool.query<ResultSetHeader>(`
+            UPDATE users
+                SET deleted_at = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND deleted_at IS NULL;
+            `, [ id ]);
 
-export default { getUserById, changeUserStatus, createUser, getUserByIdentifier, getAllUsers };
+    return deleted.affectedRows > 0;
+}
+
+
+export default { getUserById, changeUserStatus, createUser, getUserByIdentifier, getAllUsers, deleteUser };
