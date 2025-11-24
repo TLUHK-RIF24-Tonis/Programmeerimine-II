@@ -56,6 +56,32 @@ const userStatus = async ( req: Request, res: Response ) => {
     }
 };
 
+const getCurrentUser = async ( req: Request, res: Response ) => {
+    const userId = Number(res.locals.user.id);
+
+    if ( Number.isNaN(userId) ) {
+        return res.status(400).json({
+            success: false,
+            message: `Invalid user ID`
+        })
+    }
+
+    const currentUser = await userService.getUserById(userId);
+
+    if ( !currentUser ) {
+        return res.status(404).json({
+            success: false,
+            message: `User with ID: ${userId} does not exist!`
+        });
+    }
+
+    return res.status(200).json({
+        success: false,
+        message: `User details`,
+        currentUser
+    });
+};
+
 const createUser = async ( req: Request, res: Response ) => {
     const { username, email, password } = req.body
 
@@ -97,4 +123,19 @@ const createUser = async ( req: Request, res: Response ) => {
     };
 };
 
-export default { getUserById, userStatus, createUser, getAllUsers };
+const deleteUser = async ( req: Request, res: Response ) => {
+    const id = Number( req.params.id );
+
+    const deleted = await userService.deleteUser( id );
+
+    if ( !deleted ) {
+        return res.status(404).json({
+            success: false,
+            message: `User with ID: ${id} not found!`
+        });
+    }
+
+    return res.status(204).send();
+};
+
+export default { getUserById, userStatus, createUser, getAllUsers, deleteUser, getCurrentUser };
