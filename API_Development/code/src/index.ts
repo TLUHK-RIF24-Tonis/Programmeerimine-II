@@ -7,6 +7,7 @@ import authController from './auth/authController';
 import isLoggedIn from './auth/isLoggedMiddleware';
 import usersController from './users/usersController';
 import config from './config';
+import errorMiddleware from './general/errorMiddleware';
 
 const app = express();
 app.use(express.json());
@@ -60,10 +61,11 @@ app.get('/', (req, res) => {
 app.post('/users', usersController.createUser);
 app.post('/auth/login', authController.login);
 app.use('/courses', coursesRouter);
-app.use(isLoggedIn)
+app.use(isLoggedIn);
 app.use('/users', userRouter);
 app.use('/games', gamesRouter);
 app.use('/discs', discsRouter);
+app.use(errorMiddleware);
 
 app.listen(port, () =>{
     console.log(`API is running on http://localhost:${port}`);

@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import userService from "./userService";
 import { ResultSetHeader } from "mysql2";
 import hashService from "../general/hashService";
+import CustomError from "../general/CustomError";
 
 const getAllUsers = async ( req: Request, res: Response ) => {
     const users = await userService.getAllUsers();
@@ -12,23 +13,24 @@ const getAllUsers = async ( req: Request, res: Response ) => {
     })
 };
 
-const getUserById = async ( req: Request, res: Response ) => {
-    const id = Number(req.params.id);
+const getUserById = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const id = Number(req.params.id);
 
-    const user = await userService.getUserById(id);
+        const user = await userService.getUserById(id);
 
-    if (!user) {
-        return res.status(400).json({
-            success: false,
-            message: `User with this id: ${id} was not found!`
+        if (!user) {
+             throw new CustomError(`User with ID(${id}) does not exist`, 404)
+        };
+
+        return res.status(200).json({
+            success: true,
+            message: 'User found!',
+            user: user
         });
-    };
-
-    return res.status(200).json({
-        success: true,
-        message: 'User found!',
-        user: user
-    });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
 const userStatus = async ( req: Request, res: Response ) => {
