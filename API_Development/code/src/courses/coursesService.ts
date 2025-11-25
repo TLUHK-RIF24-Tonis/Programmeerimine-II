@@ -35,6 +35,44 @@ const deleteCourse = async ( id: number ): Promise<boolean> => {
             `, [ id ]);
 
     return deleted.affectedRows > 0;
+};
+
+const updateCourse = async ( id: number, updates: Partial<Omit<ICourses, 'id'>> ): Promise<ICourses | undefined> => {
+    
+    if (
+        updates.course_name === undefined &&
+        updates.course_location === undefined &&
+        updates.holes === undefined &&
+        updates.par === undefined
+    ) { 
+        return getCourseById(id);
+    }
+
+    const params: ( string | number | null )[] = [
+        updates.course_name ?? null,
+        updates.course_location ?? null,
+        updates.holes ?? null,
+        updates.par ?? null,
+        id
+    ];
+
+    const [result]: [ResultSetHeader, FieldPacket[]] =
+        await pool.query<ResultSetHeader>(`
+            UPDATE courses
+                SET course_name = COALESCE(?, course_name),
+                    course_location = COALESCE(?, course_location),
+                    holes = COALESCE(?, holes),
+                    par = COALESCE(?, par),
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                    AND deleted_at IS NULL;
+            `,  params);
+
+    if ( result.affectedRows === 0 ) {
+        return undefined;
+    }
+
+    return getCourseById(id);
 }
 
-export default { getCourseById, getAllCourses, createCourse, deleteCourse };
+export default { getCourseById, getAllCourses, createCourse, deleteCourse, updateCourse };

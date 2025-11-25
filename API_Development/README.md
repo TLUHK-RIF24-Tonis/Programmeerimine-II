@@ -91,9 +91,11 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 
 | Meetod | Endpoint | Kirjeldus | Ligipääs |
 |:--------|:----------|:-----------|:----------|
-| **GET** | `/courses` | Saa kõik rajad |Sisse logitud|
-| **GET** | `/courses/:id` | Saa rada id alusel |Sisse logitud|
-| **POST** | `/courses` | Lisa uus rada | Sisse logitud |
+| **GET** | `/courses` | Saa kõik rajad | Avalik |
+| **GET** | `/courses/:id` | Saa rada id alusel | Avalik |
+| **POST** | `/courses` | Lisa uus rada | Sisse logitud & Admin |
+| **DELETE** | `/courses/:id` | Soft-delete rada | Sisse logitud & Admin |
+| **PATCH** | `/courses/:id` | Uuenda raja andmeid | Sisse logitud & Admin |
 
 ---
 
