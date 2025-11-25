@@ -8,6 +8,7 @@ import isLoggedIn from './auth/isLoggedMiddleware';
 import usersController from './users/usersController';
 import config from './config';
 import errorMiddleware from './general/errorMiddleware';
+import notFoundMiddleware from './general/notFoundMiddleware';
 
 const app = express();
 app.use(express.json());
@@ -65,6 +66,7 @@ app.use(isLoggedIn);
 app.use('/users', userRouter);
 app.use('/games', gamesRouter);
 app.use('/discs', discsRouter);
+app.use(/,*/, notFoundMiddleware);
 app.use(errorMiddleware);
 
 app.listen(port, () =>{
