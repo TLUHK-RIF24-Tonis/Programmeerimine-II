@@ -1,7 +1,6 @@
 import { Router } from "express";
 import usersController from "./usersController";
 import isAdmin from "../auth/isAdmin";
-import isLoggedIn from "../auth/isLoggedMiddleware";
 
 const router = Router();
 
