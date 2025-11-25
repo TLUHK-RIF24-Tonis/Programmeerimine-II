@@ -37,25 +37,26 @@ const getGameById = async ( req: Request, res: Response, next: NextFunction ) =>
 
 };
 
-const getUserGameById = async ( req: Request, res: Response ) => {
-    const userId = res.locals.user.id;
-    const gameId = Number ( req.params.id );
+const getUserGameById = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const userId = res.locals.user.id;
+        const gameId = Number ( req.params.id );
 
-    const game = await gamesService.getUserGameById( gameId, userId );
+        const game = await gamesService.getUserGameById( gameId, userId );
 
-    if ( !game ) {
-        return res.status(404).json ({
-            success: false,
-            message: `You are not part of this game id: ${gameId}!`
+        if ( !game ) {
+            throw new CustomError(`You are not part of this game id: ${gameId}!`, 404)
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Game found!`,
+            game
         })
+    } catch ( error ) {
+        return next(error);
     }
-
-    return res.status(200).json({
-        success: true,
-        message: `Game found!`,
-        game
-    })
-}
+};
 
 const createGame = async ( req: Request, res: Response ) => {
     const { courseId, players } = req.body
