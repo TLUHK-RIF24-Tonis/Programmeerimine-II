@@ -20,7 +20,7 @@ Selle projekti eesmärk on luua **discgolfi API**, mille abil mängijad saavad m
 |Põhiresurss|Kirjeldus|*Täiendav ressurss*|Kirjeldus|
 |:-|:-|:-|:-|
 |**Users**|API-t kasutav mängija ehk kasutaja|PlayerStats|Statistika konkreetse kasutaja kohta|
-|**Courses**|Discgolfi raja ülevaade|Hole|Seotud konkreetse rajaga (üks korv)|
+|**Courses**|Discgolfi raja ülevaade|Hole (korv)|Seotud konkreetse rajaga (üks korv)|
 |**Games**|Üks mäng, mida kasutaja on mänginud konkreetsel rajal|Score|Iga mängija visete arv korvi kohta|
 |**Discs**|Halda kogumit|Bag|Kasutaja ketaste kogum|
 
