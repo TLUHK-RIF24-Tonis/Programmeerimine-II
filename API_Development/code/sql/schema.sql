@@ -92,6 +92,15 @@ CREATE TABLE multiplayer_games (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;
 
+CREATE TABLE error_logs (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    error_message TEXT NOT NULL,
+    stack TEXT NULL,
+    error_method VARCHAR(255) NULL,
+    error_route VARCHAR(255) NULL,
+    user_id INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 ALTER TABLE multiplayer_games
 RENAME COLUMN status TO status;
