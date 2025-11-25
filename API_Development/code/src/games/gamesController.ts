@@ -63,7 +63,7 @@ const createGame = async ( req: Request, res: Response, next: NextFunction ) => 
     const { courseId, players } = req.body
 
     if (!courseId) {
-        throw new CustomError(`CourseId is required!`, 404);
+        throw new CustomError(`CourseId is required!`, 400);
     }
 
     if (!Array.isArray(players) || players.length === 0) {
@@ -75,7 +75,8 @@ const createGame = async ( req: Request, res: Response, next: NextFunction ) => 
 
     return res.status (201).json({
         success: true,
-        message: `Game created with ID:${createdGame}`
+        message: `Game created!`,
+        id: createdGame
     })
     } catch ( error ) {
         return next(error);
