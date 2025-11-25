@@ -100,7 +100,4 @@ CREATE TABLE error_logs (
     error_route VARCHAR(255) NULL,
     user_id INT UNSIGNED NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-ALTER TABLE multiplayer_games
-RENAME COLUMN status TO status;
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;
