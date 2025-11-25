@@ -65,7 +65,7 @@ const createGame = async ( req: Request, res: Response, next: NextFunction ) => 
     if (!courseId) {
         throw new CustomError(`CourseId is required!`, 404);
     }
-    
+
     if (!Array.isArray(players) || players.length === 0) {
         throw new CustomError(`Players are required!`, 400);
     };
@@ -82,111 +82,99 @@ const createGame = async ( req: Request, res: Response, next: NextFunction ) => 
     }
 };
 
-const getMyGames = async ( req: Request, res: Response ) => {
+const getMyGames = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
     const userId = res.locals.user.id;
-
     const getGames = await gamesService.getAllUserGames(userId)
+
     if ( !getGames ) {
-        return res.status(400).json({
-            success: false,
-            message: `You have not played any game yet!`
-        })
+        throw new CustomError(`You have not played any game yet!`, 400);
     } else {
         return res.status(200).json({
             success: true,
             message: `All you games loaded:`,
             getGames
-        })
+        });
+    }
+    } catch ( error ) {
+        return next(error);
     }
 };
 
-const deleteGame = async ( req: Request, res: Response ) => {
+const deleteGame = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
     const id = Number( req.params.id );
 
     const deleted = await gamesService.deleteGame(id);
 
     if ( !deleted ) {
-        return res.status(404).json({
-            success: false,
-            message: `Game with id: ${id} not found!`
-        });
+        throw new CustomError(`Game with id: ${id} not found!`, 404);
     }
     
     return res.status(200).json({
         success: true,
         message: `Game with id: ${id} marked as deleted!`
-    })
-
+    });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
-const removeFromGame = async ( req: Request, res: Response ) => {
+const removeFromGame = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
     const userId = res.locals.user.id;
     const gameId = Number( req.params.id );
 
     const remove = await gamesService.removeUserFromGame( gameId, userId );
 
     if ( !remove ) {
-        return res.status(404).json({
-            success: false,
-            message: `Game with id: ${gameId} does not exist or user is not part of the game!`
-        })
+        throw new CustomError(`Game with id: ${gameId} does not exist or user is not part of the game!`, 404);
     }
 
     return res.status(200).json({
         success: true,
         message: `You have been removed from game ${gameId}`
-    })
+    });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
-const updateGame = async ( req: Request, res: Response ) => {
+const updateGame = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
     const activeUser = Number(res.locals.user.id);
     const gameId = Number(req.params.id);
-    const { playerId, score, datePlayed } = req.body;
+    const { playerId, score } = req.body;
 
     if ( 
         playerId === undefined &&
         score === undefined
     ) {
-        return res.status(400).json({
-            success: false,
-            message: `Atleast one field must be provided`
-        })
+        throw new CustomError(`Atleast one field must be provided`, 400);
     }
 
     const parsedPlayerId = Number(playerId);
     if ( Number.isNaN(parsedPlayerId) ) {
-        return res.status(400).json({
-            success: false,
-            message: `PlayerId must be a number`
-        });
+        throw new CustomError(`PlayerId must be a number`, 400);
     }
 
     const existingGame = await gamesService.getGameMeta(gameId);
 
     if ( !existingGame ) {
-        return res.status(404).json({
-            success: false,
-            message: `Game not found!`
-        });
+        throw new CustomError(`Game not found!`, 404);
     }
 
     const isCreator = Number(existingGame.created_by) === activeUser;
     const isSelf = parsedPlayerId === activeUser;
 
     if ( !isCreator && !isSelf ) {
-        return res.status(403).json({
-            success: false,
-            message: `You are not allowed to modify this game`
-        });
+        throw new CustomError(`You are not allowed to modify this game`, 403);
     }
 
     const update = await gamesService.updatePlayerScore( gameId, parsedPlayerId, score);
 
     if ( !update ) {
-        return res.status(403).json({
-            success: false,
-            message: `Incorrect Player ID or Game ID!`
-        });
+        throw new CustomError(`Incorrect Player ID or Game ID!`, 403);
     }
 
     const updatedGame = await gamesService.getGameById( gameId );
@@ -196,6 +184,9 @@ const updateGame = async ( req: Request, res: Response ) => {
         message: `Game updated`,
         updatedGame
     });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
 export default { getGameById, getAllGames, createGame, getMyGames, deleteGame, removeFromGame, getUserGameById, updateGame };
