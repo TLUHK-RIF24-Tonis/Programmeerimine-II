@@ -3,8 +3,8 @@ import CustomError from "./CustomError";
 
 const errorMiddleware = (
     error: CustomError, req: Request, res: Response, next: NextFunction) => {
-        console.log(error);
-        if( error.statusCode ) {
+        console.error(`[ERROR] ${error.message}`);
+        if( error instanceof CustomError ) {
             return res.status( error.statusCode ).json({
                 success: false,
                 message: error.message
