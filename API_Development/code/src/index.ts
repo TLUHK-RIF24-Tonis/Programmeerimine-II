@@ -27,14 +27,14 @@ app.get('/', (req, res) => {
             "POST /users/:id/status": 'Change user active status'
             },
             GAMES:{
-            "GET /games": 'Get all games',
             "GET /games/myGames": 'Get logged in user specific games',
             "GET /games/:id": 'Get game by ID (User only games)',
-            "GET /games/admin/:id": 'Get game by ID',
             "POST /games/add": 'Add game',
-            "DELETE /games/:id": 'For admin to soft-delte game',
             "PATCH /games/:id/leave": 'For user to remove self from game',
-            "PATCH /games/:id": 'To update game data'
+            "PATCH /games/:id": 'To update game data',
+            "DELETE /games/:id": 'For admin to soft-delte game',
+            "GET /games/admin/:id": 'Get game by ID',
+            "GET /games": 'Get all games'
             },
             DISCS:{
             "GET /discs": 'Get all discs',
@@ -49,7 +49,8 @@ app.get('/', (req, res) => {
             COURSES:{
             "GET /courses": 'Get all courses',
             "GET /courses/:id": 'Get course by ID',
-            "POST /courses": 'Add new course'
+            "POST /courses": 'Add new course',
+            "DELETE /courses/:id": 'Soft-delete course'
             }
         }
     });
