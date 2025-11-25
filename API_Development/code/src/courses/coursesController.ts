@@ -80,4 +80,19 @@ const createCourse = async ( req: Request, res: Response ) => {
     }
 };
 
-export default { getAllCourses, getCourseById, createCourse };
+const deleteCourse = async ( req: Request, res: Response ) => {
+    const id = Number( req.params.id );
+
+    const deleted = await coursesService.deleteCourse( id );
+
+    if ( !deleted ) {
+        return res.status(404).json({
+            success: false,
+            message: `Course(${id}) not found!`
+        });
+    }
+
+    return res.status(204).send();
+};
+
+export default { getAllCourses, getCourseById, createCourse, deleteCourse };

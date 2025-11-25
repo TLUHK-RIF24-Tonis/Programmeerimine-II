@@ -25,4 +25,16 @@ const createCourse = async ( name: string, location: string, holes: number, par:
     return addedCourse;
 };
 
-export default { getCourseById, getAllCourses, createCourse };
+const deleteCourse = async ( id: number ): Promise<boolean> => {
+    const [deleted]: [ResultSetHeader, FieldPacket[]] = 
+        await pool.query<ResultSetHeader>(`
+            UPDATE courses
+                SET deleted_at = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND deleted_at IS NULL;
+            `, [ id ]);
+
+    return deleted.affectedRows > 0;
+}
+
+export default { getCourseById, getAllCourses, createCourse, deleteCourse };
