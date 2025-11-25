@@ -1,5 +1,4 @@
 import { IDiscs } from "./discsInterface";
-import { discs, userDiscs, users } from "../data";
 import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import pool from "../database";
 

@@ -1,4 +1,3 @@
-import { courses } from "../data";
 import ICourses from "./coursesInterface";
 import pool from "../database";
 import { FieldPacket, ResultSetHeader } from "mysql2";
