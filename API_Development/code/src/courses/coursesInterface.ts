@@ -6,6 +6,8 @@ interface ICourses extends RowDataPacket {
     location: string;
     holes: number;
     par: number;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export default ICourses;

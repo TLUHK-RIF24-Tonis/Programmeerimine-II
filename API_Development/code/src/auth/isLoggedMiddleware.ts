@@ -35,7 +35,6 @@ const isLoggedIn = ( req: Request, res: Response, next: NextFunction ) => {
     }
 
     res.locals.user = payload;
-    console.log(payload)
     return next();
 };
 

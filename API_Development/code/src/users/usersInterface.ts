@@ -8,6 +8,8 @@ interface IUsers extends RowDataPacket {
     created: Date;
     active: boolean;
     role: 'user' | 'admin';
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface IUsersData {

@@ -50,7 +50,8 @@ app.get('/', (req, res) => {
             "GET /courses": 'Get all courses',
             "GET /courses/:id": 'Get course by ID',
             "POST /courses": 'Add new course',
-            "DELETE /courses/:id": 'Soft-delete course'
+            "DELETE /courses/:id": 'Soft-delete course',
+            "PATCH /courses/:id": 'Update course data'
             }
         }
     });
@@ -58,9 +59,9 @@ app.get('/', (req, res) => {
 
 app.post('/users', usersController.createUser);
 app.post('/auth/login', authController.login);
+app.use('/courses', coursesRouter);
 app.use(isLoggedIn)
 app.use('/users', userRouter);
-app.use('/courses', coursesRouter);
 app.use('/games', gamesRouter);
 app.use('/discs', discsRouter);
 

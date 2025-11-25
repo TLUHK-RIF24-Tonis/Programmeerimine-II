@@ -95,4 +95,36 @@ const deleteCourse = async ( req: Request, res: Response ) => {
     return res.status(204).send();
 };
 
-export default { getAllCourses, getCourseById, createCourse, deleteCourse };
+const updatedCourse = async ( req: Request, res: Response ) => {
+    const id = Number( req.params.id );
+    const { course_name, course_location, holes, par } = req.body;
+
+    if ( 
+        course_name === undefined &&
+        course_location === undefined &&
+        holes === undefined &&
+        par === undefined 
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: `Missing input: Course name, -Location, hole number or PAR`
+        });
+    }
+
+    const updated = await coursesService.updateCourse ( id, { course_name, course_location, holes, par } );
+
+    if ( !updated ) {
+        return res.status(404).json({
+            success: false,
+            message: `Course(${id}) does not exist!`
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: `Course updated!`,
+        Course: updated
+    })
+}
+
+export default { getAllCourses, getCourseById, createCourse, deleteCourse, updatedCourse };
