@@ -19,6 +19,9 @@ app.get('/', (req, res) => {
         message: 'API is running!',
         endpoints: {
             USERS:{
+            "GET /users/me": 'Get logged in user data',
+            "PATCH /users/me": 'Change logged in user data',
+            "PATCH /users/:id": 'Change user data',
             "GET /users": 'Get all users',
             "GET /users/:id": 'Get user by ID',
             "POST /users/:id/status": 'Change user active status'
@@ -27,7 +30,7 @@ app.get('/', (req, res) => {
             "GET /games": 'Get all games',
             "GET /games/myGames": 'Get logged in user specific games',
             "GET /games/:id": 'Get game by ID (User only games)',
-            "GET /games/admin/:id": 'Get game by ID (Admin)',
+            "GET /games/admin/:id": 'Get game by ID',
             "POST /games/add": 'Add game',
             "DELETE /games/:id": 'For admin to soft-delte game',
             "PATCH /games/:id/leave": 'For user to remove self from game',
@@ -36,9 +39,12 @@ app.get('/', (req, res) => {
             DISCS:{
             "GET /discs": 'Get all discs',
             "GET /discs/:id": 'Get disc by ID',
+            "GET /discs/me": 'Get all user discs',
             "POST /discs": 'Add new disc',
             "GET /discs/user/:id": 'Get one specific user discs',
-            "POST /discs/user/disc/check": 'Check if user(:id) has this disc(:id)'
+            "POST /discs/user/disc/check": 'Check if user(:id) has this disc(:id)',
+            "DELETE /discs/:id": 'Soft-delete disc',
+            "PATCH /discs:id": 'Change created disc data'
             },
             COURSES:{
             "GET /courses": 'Get all courses',
