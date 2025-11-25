@@ -8,10 +8,6 @@ const getAllUsers = async ( req: Request, res: Response, next: NextFunction ) =>
     try {
         const users = await userService.getAllUsers();
 
-        if ( !users ) {
-            throw new CustomError(`There are no users!`, 400)
-        };
-
         return res.status(200).json({
             success: true,
             users,
@@ -53,7 +49,7 @@ const userStatus = async ( req: Request, res: Response, next: NextFunction ) => 
             throw new CustomError(`${changeStatus.username} is not active!`, 200)
         }
         if (!user) {
-            throw new CustomError(`User with this id: ${id} was not found!`, 404)
+            throw new CustomError(`User with this id: ${id} was not found!`, 403)
         } else { 
         return res.status(200).json({
             success: true,
@@ -65,141 +61,127 @@ const userStatus = async ( req: Request, res: Response, next: NextFunction ) => 
     }
 };
 
-const createUser = async ( req: Request, res: Response ) => {
-    const { username, email, password } = req.body
-
-    if ( !username || !email || !password ) {
-        return res.status(400).json({
-            success: false,
-            message: `Details are missing for account creation!`
-        });
-    };
-
-    const identifyUser = await userService.getUserByIdentifier( email || username);
-
-    if ((identifyUser)) {
-        return res.status(400).json({
-            success: false,
-            message: 'User already exist!',
-        });
-    };
-
-    const hashedPassword = hashService.hash(password);
-
+const createUser = async ( req: Request, res: Response, next: NextFunction ) => {
     try {
-    const createdUser = await userService.createUser(username, email, hashedPassword);
-    return res.status(201).json({
-        success: true,
-        message: `User created with id: ${createdUser.insertId}`,
-    })} catch ( err: any) {
-        if ( err.code === 'ER_DUP_ENTRY') {
-            return res.status(400).json({
-                success: false,
-                message: `Username or email already taken`
-            });
-        } else {
-            return res.status(500).json({
-                success: false,
-                message: 'Database error:', err
-            });
-        }
-    };
-};
+        const { username, email, password } = req.body
 
-const deleteUser = async ( req: Request, res: Response ) => {
-    const id = Number( req.params.id );
+        if ( !username || !email || !password ) {
+            throw new CustomError(`Details are missing for account creation!`, 400)
+        };
 
-    const deleted = await userService.deleteUser( id );
+        const identifyUser = await userService.getUserByIdentifier( email || username);
 
-    if ( !deleted ) {
-        return res.status(404).json({
-            success: false,
-            message: `User with ID: ${id} not found!`
-        });
-    }
+        if ( identifyUser ) {
+            throw new CustomError(`User with this email or username already exist!`, 400)
+        };
 
-    return res.status(204).send();
-};
+        const hashedPassword = hashService.hash(password);
 
-const getCurrentUser = async ( req: Request, res: Response ) => {
+        const createdUser = await userService.createUser(username, email, hashedPassword);
 
-    const userId = res.locals.user.id
-
-    const currentUser = await userService.getUserById(userId);
-
-    if ( !currentUser ) {
-        return res.status(404).json({
-            success: false,
-            message: `User with ID: ${userId} does not exist!`
-        });
-    }
-
-    return res.status(200).json({
-        success: false,
-        message: `User details`,
-        currentUser
+        return res.status(201).json({
+            success: true,
+            message: `User created with id: ${createdUser.insertId}`,
     });
-};
-
-const updateUser = async ( req: Request, res: Response ) => {
-
-    const id = Number(req.params.id);
-    const { email, username, password, role } = req.body
-
-    if ( email === undefined && username === undefined &&
-        password === undefined && role === undefined ) {
-            return res.status(400).json({
-                success: false,
-                message: `Missing input: email, username or password`
-            });
+    } catch ( error ) {
+        if ((error as any).code === 'ER_DUP_ENTRY') {
+            return next(new CustomError("Email or username already in use", 400));
         }
     
-    const updated = await userService.updateUser( id, { email, username, password })
-
-    if ( !updated ) {
-        return res.status(404).json({
-            success: false,
-            message: `User(${id}) does not exist!`
-        });
+    return next(error);
     }
+};
+    
 
-    return res.status(200).json({
-        success: true,
-        message: `User updated`,
-        User: updated
-    });
-}
+const deleteUser = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const id = Number( req.params.id );
 
-const updateSelf = async ( req: Request, res: Response ) => {
+        const deleted = await userService.deleteUser( id );
 
-    const userId = res.locals.user.id;
-    const { email, username, password } = req.body;
+        if ( !deleted ) {
+            throw new CustomError(`User with ID: ${id} not found!`, 404);
+        }
 
-    if(
-        email === undefined &&
-        username === undefined &&
-        password === undefined
-    ) {
-        return res.status(400).json({
-            success: false,
-            message: `Provide at least one field to update`
-        });
+        return res.status(204).send();
+    } catch ( error ) {
+        return next(error);
     }
+};
 
-    const updated = await userService.updateUser(userId, { email, username, password });
+const getCurrentUser = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const userId = res.locals.user.id
 
-    if ( !updated ) {
-        return res.status(404).json({
+        const currentUser = await userService.getUserById(userId);
+
+        if ( !currentUser ) {
+            throw new CustomError(`User with ID: ${userId} does not exist!`, 404);
+        }
+
+        return res.status(200).json({
             success: false,
-            message: `User(${userId}) does not exist`
+            message: `User details`,
+            currentUser
         });
+    } catch ( error ) {
+        return next(error);
     }
+};
 
-    return res.status(200).json({
-        success: true,
-        message: `Profile updated!`,
-        user: updated
-    });
+const updateUser = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const id = Number(req.params.id);
+        const { email, username, password, role } = req.body
+
+        if ( email === undefined && username === undefined &&
+            password === undefined && role === undefined ) {
+            throw new CustomError(`Missing input: email, username or password`, 400);
+            }
+        
+        const updated = await userService.updateUser( id, { email, username, password })
+
+        if ( !updated ) {
+            throw new CustomError(`User(${id}) does not exist!`, 404);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `User updated`,
+            User: updated
+        });
+    } catch ( error ) {
+        return next(error);
+    }
+};
+
+const updateSelf = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const userId = res.locals.user.id;
+        const { email, username, password } = req.body;
+
+        if(
+            email === undefined &&
+            username === undefined &&
+            password === undefined
+        ) {
+            throw new CustomError(`Provide at least one field to update`, 400);
+        }
+
+        const updated = await userService.updateUser(userId, { email, username, password });
+
+        if ( !updated ) {
+            throw new CustomError(`User(${userId}) does not exist`, 404);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Profile updated!`,
+            user: updated
+        });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
 export default { getUserById, userStatus, createUser, getAllUsers, deleteUser, getCurrentUser, updateUser, updateSelf };
