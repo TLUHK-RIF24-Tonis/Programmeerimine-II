@@ -1,34 +1,40 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import gamesService from "./gamesService";
-import userService from "../users/userService";
+import CustomError from "../general/CustomError";
 
-const getAllGames = async ( req: Request, res: Response ) => {
-    const games = await gamesService.getAllGames()
+const getAllGames = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const games = await gamesService.getAllGames()
 
-    return res.status(200).json ({
-        success: true,
-        message: `All games loaded!`,
-        games,
-    });
+        return res.status(200).json ({
+            success: true,
+            message: `All games loaded!`,
+            games,
+        });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
-const getGameById = async ( req: Request, res: Response ) => {
-    const id = Number(req.params.id);
+const getGameById = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const id = Number(req.params.id);
 
-    const game = await gamesService.getGameById(id);
+        const game = await gamesService.getGameById(id);
 
-    if (!game) {
-        return res.status(404).json ({
-            success: false,
-            message: `Game does not exist!`
-        })
+        if (!game) {
+            throw new CustomError(`Game does not exist!`, 404)
+        }
+
+        return res.status(200).json ({
+            success: true,
+            message: `Game found by ID!`,
+            game,
+        });
+    } catch ( error ) {
+        return next(error);
     }
 
-    return res.status(200).json ({
-        success: true,
-        message: `Game found by ID!`,
-        game,
-    });
 };
 
 const getUserGameById = async ( req: Request, res: Response ) => {
