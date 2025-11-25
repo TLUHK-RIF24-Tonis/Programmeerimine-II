@@ -4,13 +4,22 @@ import { ResultSetHeader } from "mysql2";
 import hashService from "../general/hashService";
 import CustomError from "../general/CustomError";
 
-const getAllUsers = async ( req: Request, res: Response ) => {
-    const users = await userService.getAllUsers();
-    return res.status(200).json({
-        success: true,
-        users,
-        message: 'List of users'
-    })
+const getAllUsers = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const users = await userService.getAllUsers();
+
+        if ( !users ) {
+            throw new CustomError(`There are no users!`, 400)
+        };
+
+        return res.status(200).json({
+            success: true,
+            users,
+            message: 'List of users'
+        });
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
 const getUserById = async ( req: Request, res: Response, next: NextFunction ) => {
@@ -33,28 +42,26 @@ const getUserById = async ( req: Request, res: Response, next: NextFunction ) =>
     }
 };
 
-const userStatus = async ( req: Request, res: Response ) => {
-    const id = Number(req.params.id);
+const userStatus = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const id = Number(req.params.id);
 
-    const user = await userService.getUserById(id);
-    const changeStatus = await userService.changeUserStatus(id);
+        const user = await userService.getUserById(id);
+        const changeStatus = await userService.changeUserStatus(id);
 
-    if (!changeStatus.active) {
-    return res.status(200).json({
-        success: false,
-        message: `${changeStatus.username} is not active!`
-    });
-}
-    if (!user) {
-    return res.status(400).json({
-        success: false,
-        message: `User with this id: ${id} was not found!`
-    });
-}   else { 
-    return res.status(200).json({
-        success: true,
-        message: `${changeStatus.username} is active `
-    })
+        if (!changeStatus.active) {
+            throw new CustomError(`${changeStatus.username} is not active!`, 200)
+        }
+        if (!user) {
+            throw new CustomError(`User with this id: ${id} was not found!`, 404)
+        } else { 
+        return res.status(200).json({
+            success: true,
+            message: `${changeStatus.username} is active `
+        })
+        }
+    } catch ( error ) {
+        return next(error);
     }
 };
 
