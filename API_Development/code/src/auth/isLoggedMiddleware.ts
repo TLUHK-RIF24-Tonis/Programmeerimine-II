@@ -19,7 +19,23 @@ const isLoggedIn = ( req: Request, res: Response, next: NextFunction ) => {
             message: 'You are not logged in!'
         });
     }
+
+    if (!payload || typeof payload !== "object") {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid token"
+        });
+    }
+
+    if (!("id" in payload)) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid token: user ID missing"
+        });
+    }
+
     res.locals.user = payload;
+    console.log(payload)
     return next();
 };
 
