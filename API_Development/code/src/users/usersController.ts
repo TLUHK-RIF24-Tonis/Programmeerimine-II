@@ -56,32 +56,6 @@ const userStatus = async ( req: Request, res: Response ) => {
     }
 };
 
-const getCurrentUser = async ( req: Request, res: Response ) => {
-    const userId = Number(res.locals.user.id);
-
-    if ( Number.isNaN(userId) ) {
-        return res.status(400).json({
-            success: false,
-            message: `Invalid user ID`
-        })
-    }
-
-    const currentUser = await userService.getUserById(userId);
-
-    if ( !currentUser ) {
-        return res.status(404).json({
-            success: false,
-            message: `User with ID: ${userId} does not exist!`
-        });
-    }
-
-    return res.status(200).json({
-        success: false,
-        message: `User details`,
-        currentUser
-    });
-};
-
 const createUser = async ( req: Request, res: Response ) => {
     const { username, email, password } = req.body
 
@@ -138,4 +112,85 @@ const deleteUser = async ( req: Request, res: Response ) => {
     return res.status(204).send();
 };
 
-export default { getUserById, userStatus, createUser, getAllUsers, deleteUser, getCurrentUser };
+const getCurrentUser = async ( req: Request, res: Response ) => {
+
+    const userId = res.locals.user.id
+
+    const currentUser = await userService.getUserById(userId);
+
+    if ( !currentUser ) {
+        return res.status(404).json({
+            success: false,
+            message: `User with ID: ${userId} does not exist!`
+        });
+    }
+
+    return res.status(200).json({
+        success: false,
+        message: `User details`,
+        currentUser
+    });
+};
+
+const updateUser = async ( req: Request, res: Response ) => {
+
+    const id = Number(req.params.id);
+    const { email, username, password, role } = req.body
+
+    if ( email === undefined && username === undefined &&
+        password === undefined && role === undefined ) {
+            return res.status(400).json({
+                success: false,
+                message: `Missing input: email, username or password`
+            });
+        }
+    
+    const updated = await userService.updateUser( id, { email, username, password })
+
+    if ( !updated ) {
+        return res.status(404).json({
+            success: false,
+            message: `User(${id}) does not exist!`
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: `User updated`,
+        updated
+    });
+}
+
+const updateSelf = async ( req: Request, res: Response ) => {
+
+    const userId = res.locals.user.id;
+    const { email, username, password } = req.body;
+
+    if(
+        email === undefined &&
+        username === undefined &&
+        password === undefined
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: `Provide at least one field to update`
+        });
+    }
+
+    const updated = await userService.updateUser(userId, { email, username, password });
+
+    if ( !updated ) {
+        return res.status(404).json({
+            success: false,
+            message: `User(${userId}) does not exist`
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: `Profile updated!`,
+        user: updated
+    });
+};
+
+export default { getUserById, userStatus, createUser, getAllUsers, deleteUser, getCurrentUser, updateUser, updateSelf };

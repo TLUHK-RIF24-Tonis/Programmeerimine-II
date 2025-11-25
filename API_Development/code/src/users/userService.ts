@@ -1,6 +1,7 @@
 import IUsers, { IUsersData } from './usersInterface';
 import pool from '../database';
 import { FieldPacket, ResultSetHeader } from 'mysql2';
+import hashService from '../general/hashService';
 
 const getAllUsers = async () : Promise<IUsers[]> => {
     const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, email, username, user_role as role, created_at as createdAt FROM users;');
@@ -45,7 +46,44 @@ const deleteUser = async ( id: number ): Promise<boolean> => {
             `, [ id ]);
 
     return deleted.affectedRows > 0;
+};
+
+const updateUser = async ( id: number, updates: Partial<Omit<IUsers, 'id'>> ): Promise<IUsers | undefined> => {
+    if (
+        updates.email === undefined &&
+        updates.username === undefined &&
+        updates.password === undefined
+    ) {
+        return getUserById(id);
+    }
+
+    const hashedPassword = updates.password !== undefined 
+                        ?hashService.hash(updates.password) : null;
+    
+    const params: ( string | number | null )[] = [
+        updates.email ?? null,
+        hashedPassword,
+        updates.username ?? null,
+        id
+    ];
+
+    const [result]: [ResultSetHeader, FieldPacket[]] =
+        await pool.query<ResultSetHeader>(`
+            UPDATE users
+            SET email = COALESCE(?, email),
+                password_hash = COALESCE(?, password_hash),
+                username = COALESCE(?, username),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+                AND deleted_at IS NULL;
+            `, params);
+
+    if ( result.affectedRows === 0 ) {
+        return undefined;
+    }
+
+    return getUserById(id);
 }
 
 
-export default { getUserById, changeUserStatus, createUser, getUserByIdentifier, getAllUsers, deleteUser };
+export default { getUserById, changeUserStatus, createUser, getUserByIdentifier, getAllUsers, deleteUser, updateUser };
