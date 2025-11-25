@@ -11,7 +11,7 @@ const getAllGames = async () : Promise<IGames[]> => {
                 'user_id', mp.user_id,
                 'username', u.username,
                 'score', mp.score,
-                'status', mp.status)
+                'status', mp.game_status)
         ) AS players,
         COUNT(mp.user_id) AS player_count,
         CASE
