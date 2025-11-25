@@ -1,41 +1,35 @@
 import { Request, Response, NextFunction } from "express";
 import jwtService from "../general/jwtService";
+import CustomError from "../general/CustomError";
 
 const isLoggedIn = ( req: Request, res: Response, next: NextFunction ) => {
-    const token = req.headers.authorization?.split( ' ' )[1];
+    try {
+        const token = req.headers.authorization?.split( ' ' )[1];
 
-    if ( !token ) {
-        return res.status(401).json({
-            success: false,
-            message: 'You need to provide token!'
-        });
+        if ( !token ) {
+            throw new CustomError(`You need to provide token!`, 401);
+        }
+
+        const payload = jwtService.verify(token);
+
+        if ( !payload ) {
+            throw new CustomError(`You are not logged in!`, 401);
+        }
+
+        if (!payload || typeof payload !== "object") {
+            throw new CustomError(`Invalid token`, 401);
+        }
+
+        if (!("id" in payload)) {
+            throw new CustomError(`Invalid token: user ID missing`, 401);
+        }
+
+        res.locals.user = payload;
+        return next();
+        
+    } catch ( error ) {
+        return next(error);
     }
-
-    const payload = jwtService.verify(token);
-
-    if ( !payload ) {
-        return res.status(401).json({
-            success: false,
-            message: 'You are not logged in!'
-        });
-    }
-
-    if (!payload || typeof payload !== "object") {
-        return res.status(401).json({
-            success: false,
-            message: "Invalid token"
-        });
-    }
-
-    if (!("id" in payload)) {
-        return res.status(401).json({
-            success: false,
-            message: "Invalid token: user ID missing"
-        });
-    }
-
-    res.locals.user = payload;
-    return next();
 };
 
 export default isLoggedIn;

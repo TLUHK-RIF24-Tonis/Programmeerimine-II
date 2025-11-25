@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import userService from "./userService";
-import { ResultSetHeader } from "mysql2";
 import hashService from "../general/hashService";
 import CustomError from "../general/CustomError";
 
