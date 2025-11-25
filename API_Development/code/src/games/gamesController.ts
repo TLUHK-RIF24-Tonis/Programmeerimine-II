@@ -58,19 +58,16 @@ const getUserGameById = async ( req: Request, res: Response, next: NextFunction 
     }
 };
 
-const createGame = async ( req: Request, res: Response ) => {
+const createGame = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
     const { courseId, players } = req.body
 
-    if (!courseId)
-        return res.status(400).json({
-            success: false,
-            message: `CourseId is required!`
-    });
+    if (!courseId) {
+        throw new CustomError(`CourseId is required!`, 404);
+    }
+    
     if (!Array.isArray(players) || players.length === 0) {
-        return res.status(400).json({
-            success: false,
-            message: `Players are required!`
-        });
+        throw new CustomError(`Players are required!`, 400);
     };
 
     const creatorId = res.locals.user.id;
@@ -80,6 +77,9 @@ const createGame = async ( req: Request, res: Response ) => {
         success: true,
         message: `Game created with ID:${createdGame}`
     })
+    } catch ( error ) {
+        return next(error);
+    }
 };
 
 const getMyGames = async ( req: Request, res: Response ) => {
