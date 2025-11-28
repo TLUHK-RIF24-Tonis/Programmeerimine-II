@@ -8,7 +8,7 @@ const pool = mysql
     user: config.db.user,
     password: config.db.password,
     database: config.db.database,
-    multipleStatements: true,
+    multipleStatements: false, // kui see on true soodustab sql injectioni.
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

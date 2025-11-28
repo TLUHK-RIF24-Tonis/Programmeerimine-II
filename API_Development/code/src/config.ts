@@ -2,8 +2,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log(process.env.DB_HOST, process.env.DB_PORT)
-
 const config = {
     jwtSecret: process.env.JWT_SECRET,
     db: {

@@ -37,7 +37,9 @@ VALUES
   (5, 3, NOW()),
   (6, 6, NOW()),
   (7, 7, NOW()),
-  (8, 8, NOW());
+  (8, 8, NOW()),
+  (9, 2, NOW()),
+  (10, 4, NOW());
 
 INSERT INTO multiplayer_games (game_id, user_id, score) VALUES
   (1, 4, 50),

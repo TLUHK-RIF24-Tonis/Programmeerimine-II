@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import userService from "./userService";
-import { ResultSetHeader } from "mysql2";
 import hashService from "../general/hashService";
 
 const getAllUsers = async ( req: Request, res: Response ) => {
@@ -35,24 +34,26 @@ const userStatus = async ( req: Request, res: Response ) => {
     const id = Number(req.params.id);
 
     const user = await userService.getUserById(id);
-    const changeStatus = await userService.changeUserStatus(id);
 
-    if (!changeStatus.active) {
-    return res.status(200).json({
-        success: false,
-        message: `${changeStatus.username} is not active!`
-    });
-}
     if (!user) {
     return res.status(400).json({
         success: false,
         message: `User with this id: ${id} was not found!`
     });
-}   else { 
+    }
+
+    const changeStatus = await userService.changeUserStatus(id);
+
+    if (!changeStatus.active) {
+    return res.status(400).json({
+        success: false,
+        message: `${changeStatus.username} is not active!`
+    });
+    } else { 
     return res.status(200).json({
         success: true,
         message: `${changeStatus.username} is active `
-    })
+    });
     }
 };
 

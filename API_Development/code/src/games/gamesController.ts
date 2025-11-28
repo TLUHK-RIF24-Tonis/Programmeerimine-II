@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import gamesService from "./gamesService";
-import userService from "../users/userService";
 
 const getAllGames = async ( req: Request, res: Response ) => {
     const games = await gamesService.getAllGames()
@@ -45,12 +44,24 @@ const createGame = async ( req: Request, res: Response ) => {
             message: `Players are required!`
         });
     };
+    if ( !players.every( p =>
+        p &&
+        typeof p === 'object' &&
+        !Array.isArray(p) &&
+        Number.isInteger( p.userId ) &&
+        Number.isFinite( p.score )
+    )) {
+        return res.status(400).json ({
+            success: false,
+            message: `Each player must have a numberic userId and score!`
+        })
+    };
 
     const createdGame = await gamesService.createGame( courseId, players )
 
     return res.status (201).json({
         success: true,
-        message: `Game created with ID:${createdGame}`
+        message: `Game created with ID: ${createdGame}`
     })
 };
 
@@ -66,10 +77,10 @@ const getMyGames = async ( req: Request, res: Response ) => {
     } else {
         return res.status(200).json({
             success: true,
-            message: `All you games loaded:`,
+            message: `All your games loaded:`,
             getGames
         })
-    }
+    };
 
 };
 

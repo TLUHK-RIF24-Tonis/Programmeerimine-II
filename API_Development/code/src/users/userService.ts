@@ -1,4 +1,4 @@
-import IUsers, { IUsersData } from './usersInterface';
+import IUsers from './usersInterface';
 import pool from '../database';
 import { FieldPacket, ResultSetHeader } from 'mysql2';
 

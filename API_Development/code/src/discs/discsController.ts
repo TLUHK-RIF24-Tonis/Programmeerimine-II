@@ -6,11 +6,11 @@ const getAllDiscs = async (req: Request, res: Response) => {
     const discs = await discsService.getAllDiscs();
 
     if ( !discs ) {
-        return res.status(204).json({
+        return res.status(200).json({
             success: true,
             message: `There are no discs!`,
             discs: []
-        })
+        });
     }
 
     return res.status(200).json ({
@@ -30,14 +30,13 @@ const getDiscById = async (req: Request, res: Response) => {
         success: true,
         message: `Disc Found!`,
         foundDisc,
-    })};
-
-    if(!foundDisc) {
-        return res.status (404).json ({
+    });
+    } else {
+        return res.status(404).json ({
             success: false,
             message: `Disc not found!`
         });
-    };
+    }
 };
 
 const getUserDiscs = async (req: Request, res: Response) => {
@@ -45,7 +44,7 @@ const getUserDiscs = async (req: Request, res: Response) => {
 
     const userDiscs = await discsService.getUserDiscs(id);
 
-    if (!userDiscs) {
+    if (!userDiscs || userDiscs.length === 0) {
         return res.status(200).json ({
             success: true,
             message: 'You dont have any discs!',
@@ -57,35 +56,36 @@ const getUserDiscs = async (req: Request, res: Response) => {
             message: 'All discs loaded',
             userDiscs
         });
-    };
+    }
 };
 
-const userHaveDisc = (req: Request, res: Response) => {
-    const { userId, discId } = req.body
+const userHaveDisc = async (req: Request, res: Response) => {
+    const userId = Number(req.query.userId);
+    const discId = Number(req.query.discId);
 
-    const isDisc = discsService.getDiscById(discId);
-    const isUser = userService.getUserById(userId);
+    const isDisc = await discsService.getDiscById(discId);
+    const isUser = await userService.getUserById(userId);
 
     if (!isDisc || !isUser) {
         return res.status(400).json ({
             success: false,
             message: 'Missing user or disc, please check if both exists!'
-        })
+        });
     }
 
-    const hasDisc = discsService.userOwnDisc(userId, discId)
+    const hasDisc = await discsService.userOwnDisc(userId, discId)
 
     if (!hasDisc) {
         return res.status(404).json ({
             success: false,
             message: `User id: ${userId} does not own this disc.`
-        })
+        });
     }
     return res.status(200).json ({
         success: true,
         message: `User id: ${userId} has this disc.`
     }) 
-}
+};
 
 const createDisc = async ( req: Request, res: Response ) => {
     const { brand, model, type, speed, glide, turn, fade } = req.body
@@ -94,14 +94,14 @@ const createDisc = async ( req: Request, res: Response ) => {
         return res.status(400).json ({
             success: false,
             message: 'Please insert disc brand, model or type!'
-        })
+        });
     }
 
     if ( speed == null || glide == null || turn == null || fade == null ) {
         return res.status(400).json ({
             success: false,
             message: 'Please insert all flight numbers ( speed, glide, turn, fade ) before adding disc!'
-        })
+        });
     }
 
     const result = await discsService.createDisc(
@@ -112,7 +112,7 @@ const createDisc = async ( req: Request, res: Response ) => {
         return res.status(409).json ({
             success: false,
             message: result.message
-        })
+        });
     } else {
         return res.status(201).json ({
             success: true,
@@ -126,7 +126,7 @@ const createDisc = async ( req: Request, res: Response ) => {
             turn,
             fade
         });
-    };
+    }
 };
 
 export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc };

@@ -1,6 +1,5 @@
 import { FieldPacket } from "mysql2";
 import pool from "../database";
-import { games, courses } from "../data";
 import IGames from "./gamesInterface";
 import { ResultSetHeader } from "mysql2";
 
@@ -74,15 +73,12 @@ const createGame = async ( courseId: number, players: InputPlayers[] ): Promise<
 
     const gameId = game.insertId;
 
-    for (const p of players) {
-        await pool.query(
-            `INSERT INTO multiplayer_games ( game_id, user_id, score ) VALUES (?, ?, ?);`, [gameId, p.userId, p.score]
-        );
-    }
+    const values = players.map( p => [gameId, p.userId, p.score] );
+    await pool.query(
+        `INSERT INTO multiplayer_games ( game_id, user_id, score ) VALUES ?;`, [values]
+    );
+
     return gameId;
 };
-
-// Hetkel ei tööta päris nii nagu mõeldud, selleks vaja luua autentimis süsteem.
-// Vaja oleks unikaalset ID-d või tokeni millega võrrelda.
 
 export default { getAllGames, getGameById, createGame, getAllUserGames };
