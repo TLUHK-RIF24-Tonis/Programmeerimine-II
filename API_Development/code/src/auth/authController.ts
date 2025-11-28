@@ -27,7 +27,7 @@ const login = async ( req: Request, res: Response, next: NextFunction ) => {
             id: user.id,
             username: user.username,
             email: user.email,
-            role: user.user_role
+            role: user.role
         });
 
         return res.status(200).json({

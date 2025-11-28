@@ -94,14 +94,15 @@ const createGame = async ( courseId: number, players: InputPlayers[], creatorId:
 
     const gameId = game.insertId;
 
-    for (const p of players) {
-        await pool.query(
-            `INSERT INTO multiplayer_games ( game_id, user_id, score ) VALUES (?, ?, ?);`, [gameId, p.userId, p.score]
-        );
-    }
+    const values = players.map( p => [gameId, p.userId, p.score] );
+    await pool.query(
+        `INSERT INTO multiplayer_games ( game_id, user_id, score ) VALUES ?;`, [values]
+    );
+
     return gameId;
 };
 
+<<<<<<< HEAD
 const deleteGame = async ( id: number ): Promise<boolean> => {
     const [deleted]: [ResultSetHeader, FieldPacket[]] = await pool.query<ResultSetHeader>(`
         UPDATE games
@@ -149,3 +150,6 @@ const getGameMeta = async (gameId: number) => {
 };
 
 export default { getAllGames, getGameById, createGame, getAllUserGames, deleteGame, removeUserFromGame, getUserGameById, updatePlayerScore, getGameMeta };
+=======
+export default { getAllGames, getGameById, createGame, getAllUserGames };
+>>>>>>> e8343dfd17876b17273ee97dadcf467ca6137257

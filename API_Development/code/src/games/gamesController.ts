@@ -69,13 +69,25 @@ const createGame = async ( req: Request, res: Response, next: NextFunction ) => 
     if (!Array.isArray(players) || players.length === 0) {
         throw new CustomError(`Players are required!`, 400);
     };
+    if ( !players.every( p =>
+        p &&
+        typeof p === 'object' &&
+        !Array.isArray(p) &&
+        Number.isInteger( p.userId ) &&
+        Number.isFinite( p.score )
+    )) {
+        return res.status(400).json ({
+            success: false,
+            message: `Each player must have a numberic userId and score!`
+        })
+    };
 
     const creatorId = res.locals.user.id;
     const createdGame = await gamesService.createGame( courseId, players, creatorId )
 
     return res.status (201).json({
         success: true,
-        message: `Game created!`,
+        message: `Game created with ID: ${createdGame}`,
         id: createdGame
     })
     } catch ( error ) {
@@ -93,7 +105,7 @@ const getMyGames = async ( req: Request, res: Response, next: NextFunction ) => 
     } else {
         return res.status(200).json({
             success: true,
-            message: `All you games loaded:`,
+            message: `All your games loaded:`,
             getGames
         });
     }
