@@ -1,4 +1,6 @@
-interface IDiscs {
+import { RowDataPacket } from "mysql2"
+
+interface IDiscs extends RowDataPacket {
    id: number,
    brand: string,
    model: string,

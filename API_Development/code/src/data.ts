@@ -3,7 +3,7 @@ import ICourses from "./courses/coursesInterface"
 import IGames from "./games/gamesInterface";
 import { IDiscs, IUserDiscs } from "./discs/discsInterface";
 
-const users: IUsers[] = [
+const users = [
     {
         id: 1,
         username: 'KollaneKoll',
@@ -40,7 +40,7 @@ const users: IUsers[] = [
         active: true, 
         role: 'user',
     }
-];
+] as IUsers[];
 
 const courses: ICourses[] = [
     {

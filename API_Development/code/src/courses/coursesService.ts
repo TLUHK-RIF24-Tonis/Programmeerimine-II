@@ -1,32 +1,28 @@
 import { courses } from "../data";
 import ICourses from "./coursesInterface";
+import pool from "../database";
+import { FieldPacket, ResultSetHeader } from "mysql2";
 
-const getCourseById = (id: number): ICourses | undefined => {
-    const course = courses.find(course => course.id === id);
-    return course
+const getCourseById = async (id: number): Promise<ICourses | undefined> => {
+    const [course]: [ICourses[], FieldPacket[]] = await pool.query(
+        `SELECT id, course_name as name, course_location, holes, par FROM courses where id = ?;`, [id])
+    return course[0];
 };
 
-const getAllCourses = () : ICourses[] => {
+const getAllCourses = async () : Promise<ICourses[]> => {
+    const [courses]: [ICourses[], FieldPacket[]] = await pool.query(
+        `SELECT id, course_name as name, course_location, holes, par, created_at as createdAt FROM courses;`)
     return courses;
 };
 
-const createCourse = ( name: string, location: string, holes: number, par: number ) => {
-    const id = courses[courses.length - 1].id + 1;
+const createCourse = async ( name: string, location: string, holes: number, par: number ) => {
 
-    const allCourses = getAllCourses();
-    const exist = allCourses.some(c => c.name === name && c.location === location);
+    const sql = `
+    INSERT INTO courses ( course_name, course_location, holes, par ) VALUES (?, ?, ?, ?);
+    `
 
-    if ( exist ) return null;
-
-    const course: ICourses = {
-        id,
-        name,
-        location,
-        holes,
-        par
-    };
-    courses.push(course);
-    return course
+    const [addedCourse] = await pool.execute<ResultSetHeader>(sql, [name, location, holes, par]);
+    return addedCourse;
 };
 
 export default { getCourseById, getAllCourses, createCourse };

@@ -3,7 +3,7 @@ import userService from "../users/userService";
 import hashService from "../general/hashService";
 import jwtService from "../general/jwtService";
 
-const login = ( req: Request, res: Response ) => {
+const login = async ( req: Request, res: Response ) => {
     const { email, password, username } = req.body;
     if ( !( email || username ) || !password ) {
         return res.status(400).json({
@@ -11,13 +11,17 @@ const login = ( req: Request, res: Response ) => {
             message: 'Email / username or password are mandatory to login!'
         })
     }
-    const user = userService.findUserByEmail(email) || userService.findUserByUsername(username);
+
+    const identifier = email || username
+    const user = await userService.getUserByIdentifier(identifier)
+
     if ( !user ) {
         return res.status(404).json({
             succes: false,
             message: 'User not found!'
         })
     }
+
     const match = hashService.compare( password, user.password );
     if ( !match ) {
         return res.status(400).json({
