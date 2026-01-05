@@ -9,6 +9,6 @@ router.get('/', coursesController.getAllCourses);
 router.get('/:id', coursesController.getCourseById);
 router.post('/', isLoggedIn, isAdmin, coursesController.createCourse);
 router.delete('/:id', isLoggedIn, isAdmin, coursesController.deleteCourse);
-router.patch('/:id', isLoggedIn, isAdmin, coursesController.updatedCourse);
+router.patch('/:id', isLoggedIn, isAdmin, coursesController.updateCourse);
 
 export default router;

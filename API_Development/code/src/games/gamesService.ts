@@ -102,7 +102,6 @@ const createGame = async ( courseId: number, players: InputPlayers[], creatorId:
     return gameId;
 };
 
-<<<<<<< HEAD
 const deleteGame = async ( id: number ): Promise<boolean> => {
     const [deleted]: [ResultSetHeader, FieldPacket[]] = await pool.query<ResultSetHeader>(`
         UPDATE games
@@ -116,7 +115,7 @@ const deleteGame = async ( id: number ): Promise<boolean> => {
 const removeUserFromGame = async ( gameId: number, userId: number ): Promise<boolean> => {
     const [remove]: [ResultSetHeader, FieldPacket[]] = await pool.query<ResultSetHeader>(`
         UPDATE multiplayer_games
-        SET status = 'removed', left_at = CURRENT_TIMESTAMP
+        SET user_status = 'removed', left_at = CURRENT_TIMESTAMP
         WHERE game_id = ? AND user_id = ?;
         `, [gameId, userId]);
 
@@ -150,6 +149,3 @@ const getGameMeta = async (gameId: number) => {
 };
 
 export default { getAllGames, getGameById, createGame, getAllUserGames, deleteGame, removeUserFromGame, getUserGameById, updatePlayerScore, getGameMeta };
-=======
-export default { getAllGames, getGameById, createGame, getAllUserGames };
->>>>>>> e8343dfd17876b17273ee97dadcf467ca6137257

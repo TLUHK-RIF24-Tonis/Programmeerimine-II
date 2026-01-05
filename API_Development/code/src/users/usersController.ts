@@ -42,13 +42,15 @@ const userStatus = async ( req: Request, res: Response, next: NextFunction ) => 
         const id = Number(req.params.id);
 
         const user = await userService.getUserById(id);
+
+        if (!user) {
+            throw new CustomError(`User with this id: ${id} was not found!`, 403)
+        }
+
         const changeStatus = await userService.changeUserStatus(id);
 
         if (!changeStatus.active) {
-            throw new CustomError(`${changeStatus.username} is not active!`, 200)
-        }
-        if (!user) {
-            throw new CustomError(`User with this id: ${id} was not found!`, 403)
+            throw new CustomError(`${changeStatus.username} is not active!`, 403)
         } else { 
         return res.status(200).json({
             success: true,
@@ -119,7 +121,7 @@ const getCurrentUser = async ( req: Request, res: Response, next: NextFunction )
         }
 
         return res.status(200).json({
-            success: false,
+            success: true,
             message: `User details`,
             currentUser
         });
@@ -135,7 +137,7 @@ const updateUser = async ( req: Request, res: Response, next: NextFunction ) => 
 
         if ( email === undefined && username === undefined &&
             password === undefined && role === undefined ) {
-            throw new CustomError(`Missing input: email, username or password`, 400);
+            throw new CustomError(`Missing input: email, username, password or role`, 400);
             }
         
         const updated = await userService.updateUser( id, { email, username, password })
@@ -147,7 +149,7 @@ const updateUser = async ( req: Request, res: Response, next: NextFunction ) => 
         return res.status(200).json({
             success: true,
             message: `User updated`,
-            User: updated
+            user: updated
         });
     } catch ( error ) {
         return next(error);

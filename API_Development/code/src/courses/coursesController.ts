@@ -31,11 +31,7 @@ const getCourseById = async (req: Request, res: Response, next: NextFunction) =>
         const course = await coursesService.getCourseById(id);
 
         if (!course) {
-            throw new CustomError(`Atleast one field must be provided`, 400);
-            return res.status(404).json ({
-                success: false,
-                message: `Course with this id: ${id} does not exist!`
-            });
+            throw new CustomError(`Atleast one field must be provided`, 404);
         };
 
         return res.status(200).json ({
@@ -94,7 +90,7 @@ const deleteCourse = async (req: Request, res: Response, next: NextFunction) => 
     }
 };
 
-const updatedCourse = async (req: Request, res: Response, next: NextFunction) => {
+const updateCourse = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = Number( req.params.id );
         const { course_name, course_location, holes, par } = req.body;
@@ -117,11 +113,11 @@ const updatedCourse = async (req: Request, res: Response, next: NextFunction) =>
         return res.status(200).json({
             success: true,
             message: `Course updated!`,
-            Course: updated
+            course: updated
         });
     } catch ( error ) {
         return next(error);
     }
 };
 
-export default { getAllCourses, getCourseById, createCourse, deleteCourse, updatedCourse };
+export default { getAllCourses, getCourseById, createCourse, deleteCourse, updateCourse };

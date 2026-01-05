@@ -163,7 +163,7 @@ const updateGame = async ( req: Request, res: Response, next: NextFunction ) => 
         playerId === undefined &&
         score === undefined
     ) {
-        throw new CustomError(`Atleast one field must be provided`, 400);
+        throw new CustomError(`At least one field must be provided`, 400);
     }
 
     const parsedPlayerId = Number(playerId);

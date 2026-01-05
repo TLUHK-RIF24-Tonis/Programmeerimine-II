@@ -30,7 +30,6 @@ INSERT INTO discs (id, brand, model, disc_type, speed, glide, turn, fade) VALUES
 
 INSERT INTO games (id, course_id, created_by, date_played)
 VALUES
-<<<<<<< HEAD
   (1, 4, 1, NOW()),
   (2, 2, 2, NOW()),
   (3, 5, 3, NOW()),
@@ -39,20 +38,8 @@ VALUES
   (6, 6, 6, NOW()),
   (7, 7, 7, NOW()),
   (8, 8, 8, NOW()),
-  (10, 4, 1, NOW());  -- ← uus rida, mis teeb FK kehtivaks
+  (10, 4, 1, NOW());
 
-=======
-  (1, 4, NOW()),
-  (2, 2, NOW()),
-  (3, 5, NOW()),
-  (4, 1, NOW()),
-  (5, 3, NOW()),
-  (6, 6, NOW()),
-  (7, 7, NOW()),
-  (8, 8, NOW()),
-  (9, 2, NOW()),
-  (10, 4, NOW());
->>>>>>> e8343dfd17876b17273ee97dadcf467ca6137257
 
 INSERT INTO multiplayer_games (game_id, user_id, score) VALUES
   (1, 4, 50),

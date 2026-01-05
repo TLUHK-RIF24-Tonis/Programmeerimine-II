@@ -22,7 +22,7 @@ const getAllDiscs = async (req: Request, res: Response, next: NextFunction) => {
         });
     } catch ( error ) {
         return next(error);
-};
+}};
 
 const getDiscById = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -41,24 +41,8 @@ const getDiscById = async (req: Request, res: Response, next: NextFunction) => {
             success: false,
             message: `Disc not found!`
         });
-    } catch (error) {
+    }} catch (error) {
         return next(error);
-    }
-};
-
-const getUserDiscs = async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    const userDiscs = await discsService.getUserDiscs(id);
-
-    if (!userDiscs || userDiscs.length === 0) {
-        return res.status(200).json ({
-            success: true,
-            message: `Disc Found!`,
-            foundDisc,
-        })};
-        } catch ( error ) {
-            return next(error);
     }
 };
 
@@ -97,7 +81,6 @@ const getMyDiscs = async (req: Request, res: Response, next: NextFunction) => {
             message: 'All discs loaded',
             userDiscs
         });
-<<<<<<< HEAD
     } catch ( error ) {
         return next(error);
     }
@@ -125,78 +108,6 @@ const userHaveDisc = (req: Request, res: Response, next: NextFunction) => {
         }) 
     } catch ( error ) {
         return next(error);
-=======
-    }
-};
-
-const userHaveDisc = async (req: Request, res: Response) => {
-    const userId = Number(req.query.userId);
-    const discId = Number(req.query.discId);
-
-    const isDisc = await discsService.getDiscById(discId);
-    const isUser = await userService.getUserById(userId);
-
-    if (!isDisc || !isUser) {
-        return res.status(400).json ({
-            success: false,
-            message: 'Missing user or disc, please check if both exists!'
-        });
-    }
-
-    const hasDisc = await discsService.userOwnDisc(userId, discId)
-
-    if (!hasDisc) {
-        return res.status(404).json ({
-            success: false,
-            message: `User id: ${userId} does not own this disc.`
-        });
-    }
-    return res.status(200).json ({
-        success: true,
-        message: `User id: ${userId} has this disc.`
-    }) 
-};
-
-const createDisc = async ( req: Request, res: Response ) => {
-    const { brand, model, type, speed, glide, turn, fade } = req.body
-
-    if ( !brand || !model || !type ) {
-        return res.status(400).json ({
-            success: false,
-            message: 'Please insert disc brand, model or type!'
-        });
-    }
-
-    if ( speed == null || glide == null || turn == null || fade == null ) {
-        return res.status(400).json ({
-            success: false,
-            message: 'Please insert all flight numbers ( speed, glide, turn, fade ) before adding disc!'
-        });
-    }
-
-    const result = await discsService.createDisc(
-        brand, model, type, speed, glide, turn, fade
-    );
-    
-    if ( !result.success ) {
-        return res.status(409).json ({
-            success: false,
-            message: result.message
-        });
-    } else {
-        return res.status(201).json ({
-            success: true,
-            message: 'Disc created!',
-            discId: result.discId,
-            brand,
-            model,
-            type,
-            speed,
-            glide,
-            turn,
-            fade
-        });
->>>>>>> e8343dfd17876b17273ee97dadcf467ca6137257
     }
 };
 
@@ -267,7 +178,7 @@ const updateDisc = async ( req: Request, res: Response, next: NextFunction ) => 
             turn === undefined &&
             fade === undefined
         ) {
-            throw new CustomError(`Atleast one field must be provided!`, 400);
+            throw new CustomError(`At least one field must be provided!`, 400);
         }
 
         const updates: Partial<{

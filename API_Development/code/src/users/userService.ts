@@ -30,7 +30,7 @@ const createUser = async ( username:string ,email: string, password_hash: string
 
 const getUserByIdentifier = async ( identifier: string ): Promise<IUsers | undefined> => {
     const [rows]: [IUsers[], FieldPacket[]] = await pool.query(
-        `SELECT id, email, username, user_role, created_at as createdAt,
+        `SELECT id, email, username, user_role as role, created_at as createdAt,
         active as Active, password_hash as password
         FROM users WHERE email = ? OR username = ? LIMIT 1;`, [identifier, identifier]);
     return rows[0];

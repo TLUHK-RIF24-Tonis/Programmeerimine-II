@@ -68,7 +68,7 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 | **GET** | `/games/admin/:id` | Kõikide kasutajate mängud id alusel |Admin|
 | **DELETE** | `/games/:id` | Mängu soft-delete |Admin|
 | **PATCH** | `/games/myGames/:id/leave` | Kustuta mäng kasutaja tasemel |Sisse logitud|
-| **PUT** | `/games/myGames/:id/update` | Uuenda mängu andmeid |Sisse logitud|
+| **PATCH** | `/games/:id` | Uuenda mängu andmeid |Sisse logitud|
 
 ---
 

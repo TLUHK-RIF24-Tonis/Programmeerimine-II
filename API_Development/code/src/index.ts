@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
             "POST /games/add": 'Add game',
             "PATCH /games/:id/leave": 'For user to remove self from game',
             "PATCH /games/:id": 'To update game data',
-            "DELETE /games/:id": 'For admin to soft-delte game',
+            "DELETE /games/:id": 'For admin to soft-delete game',
             "GET /games/admin/:id": 'Get game by ID',
             "GET /games": 'Get all games'
             },
@@ -62,11 +62,10 @@ app.get('/', (req, res) => {
 app.post('/users', usersController.createUser);
 app.post('/auth/login', authController.login);
 app.use('/courses', coursesRouter);
-app.use(isLoggedIn);
-app.use('/users', userRouter);
-app.use('/games', gamesRouter);
-app.use('/discs', discsRouter);
-app.use(/,*/, notFoundMiddleware);
+app.use('/users', isLoggedIn, userRouter);
+app.use('/games', isLoggedIn, gamesRouter);
+app.use('/discs', isLoggedIn, discsRouter);
+app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
 app.listen(port, () =>{
