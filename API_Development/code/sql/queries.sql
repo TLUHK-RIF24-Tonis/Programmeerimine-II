@@ -2,6 +2,7 @@
 
 -- USER
 
+
 -- GET /users
 
 SELECT id, email, username, user_role as role, created_at as createdAt FROM users;
@@ -13,6 +14,29 @@ SELECT id, email, username, user_role as role, created_at as createdAt, active a
 -- POST /users - Create user
 
 INSERT INTO users ( username, email, password_hash, user_role ) VALUES (?, ?, ?, ?);
+
+-- GET /users/:email | :username
+
+SELECT id, email, username, user_role, created_at as createdAt,
+        active as Active, password_hash as password
+        FROM users WHERE email = ? OR username = ? LIMIT 1;
+
+-- DELETE /users
+
+UPDATE users
+    SET deleted_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
+WHERE id = ? AND deleted_at IS NULL;
+
+-- PATCH /users
+
+UPDATE users
+SET email = COALESCE(?, email),
+    password_hash = COALESCE(?, password_hash),
+    username = COALESCE(?, username),
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+    AND deleted_at IS NULL;
 
 -- DISCS
 
@@ -61,6 +85,28 @@ SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at
 
 SELECT id, brand, model, disc_type as type, speed, glide, turn, fade, created_at as added FROM discs;
 
+-- DELETE /discs/:id
+
+UPDATE discs
+    SET deleted_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+        AND deleted_at IS NULL;
+
+-- PATCH /discs/:id
+
+UPDATE discs
+    SET brand = COALESCE(?, brand),
+        model = COALESCE(?, model),
+        disc_type = COALESCE(?, disc_type),
+        speed = COALESCE(?, speed),
+        glide = COALESCE(?, glide),
+        turn = COALESCE(?, turn),
+        fade = COALESCE(?, fade),
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+        AND deleted_at IS NULL;
+
 -- COURSES
 
 -- GET /courses/:id
@@ -74,6 +120,24 @@ SELECT id, course_name as name, course_location, holes, par, created_at as creat
 -- POST /courses 
 
 INSERT INTO courses ( course_name, course_location, holes, par ) VALUES (?, ?, ?, ?)
+
+-- DELETE /courses/:id
+
+UPDATE courses
+    SET deleted_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
+WHERE id = ? AND deleted_at IS NULL;
+
+-- PATCH /courses/:id
+
+UPDATE courses
+    SET course_name = COALESCE(?, course_name),
+        course_location = COALESCE(?, course_location),
+        holes = COALESCE(?, holes),
+        par = COALESCE(?, par),
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+        AND deleted_at IS NULL;
 
 -- GAMES
 
@@ -135,3 +199,30 @@ GROUP BY g.id, c.course_name;
 
 INSERT INTO games ( course_id ) VALUES (?);
 INSERT INTO multiplayer_games ( game_id, user_id, score ) VALUES (?, ?, ?);
+
+-- DELETE /games/:id
+
+UPDATE games
+SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+WHERE id = ? AND deleted_at IS NULL;
+
+-- PATCH /games/myGames/:id/leave
+
+UPDATE multiplayer_games
+SET status = 'removed', left_at = CURRENT_TIMESTAMP
+WHERE game_id = ? AND user_id = ?;
+
+-- PATCH UPDATE player score
+
+UPDATE multiplayer_games
+SET score = ?
+WHERE game_id = ? AND user_id = ? AND left_at IS NULL
+
+UPDATE games
+SET updated_at = CURRENT_TIMESTAMP
+WHERE id = ? 
+AND deleted_at IS NULL
+
+-- GET game meta data
+
+SELECT id, created_by FROM games WHERE id = ? AND deleted_at IS NULL

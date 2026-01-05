@@ -53,12 +53,16 @@ CREATE TABLE games (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     course_id INT UNSIGNED NULL,
     date_played TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT UNSIGNED NOT NULL,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	deleted_at TIMESTAMP NULL DEFAULT NULL,
 	CONSTRAINT fk_games_course
         FOREIGN KEY (course_id) REFERENCES courses(id)
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT fk_games_created_by
+        FOREIGN KEY (created_by) REFERENCES users(id)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE user_discs (
@@ -81,6 +85,19 @@ CREATE TABLE multiplayer_games (
     game_id INT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     score INT NOT NULL,
+    user_status ENUM('active', 'removed') NOT NULL DEFAULT 'active',
+    left_at TIMESTAMP NULL DEFAULT NULL,
+    game_status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE error_logs (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    error_message TEXT NOT NULL,
+    stack TEXT NULL,
+    error_method VARCHAR(255) NULL,
+    error_route VARCHAR(255) NULL,
+    user_id INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;

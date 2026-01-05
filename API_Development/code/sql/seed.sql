@@ -28,18 +28,18 @@ INSERT INTO discs (id, brand, model, disc_type, speed, glide, turn, fade) VALUES
   (7, 'Latitude 64',   'Pure',      'Putter',    3, 3,  0, 1),
   (8, 'Innova',        'Wraith',    'Driver',   11, 5, -1, 3);
 
-INSERT INTO games (id, course_id, date_played)
+INSERT INTO games (id, course_id, created_by, date_played)
 VALUES
-  (1, 4, NOW()),
-  (2, 2, NOW()),
-  (3, 5, NOW()),
-  (4, 1, NOW()),
-  (5, 3, NOW()),
-  (6, 6, NOW()),
-  (7, 7, NOW()),
-  (8, 8, NOW()),
-  (9, 2, NOW()),
-  (10, 4, NOW());
+  (1, 4, 1, NOW()),
+  (2, 2, 2, NOW()),
+  (3, 5, 3, NOW()),
+  (4, 1, 4, NOW()),
+  (5, 3, 5, NOW()),
+  (6, 6, 6, NOW()),
+  (7, 7, 7, NOW()),
+  (8, 8, 8, NOW()),
+  (10, 4, 1, NOW());
+
 
 INSERT INTO multiplayer_games (game_id, user_id, score) VALUES
   (1, 4, 50),

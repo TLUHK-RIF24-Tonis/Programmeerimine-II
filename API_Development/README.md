@@ -20,7 +20,7 @@ Selle projekti eesmärk on luua **discgolfi API**, mille abil mängijad saavad m
 |Põhiresurss|Kirjeldus|*Täiendav ressurss*|Kirjeldus|
 |:-|:-|:-|:-|
 |**Users**|API-t kasutav mängija ehk kasutaja|PlayerStats|Statistika konkreetse kasutaja kohta|
-|**Courses**|Discgolfi raja ülevaade|Hole|Seotud konkreetse rajaga (üks korv)|
+|**Courses**|Discgolfi raja ülevaade|Hole (korv)|Seotud konkreetse rajaga (üks korv)|
 |**Games**|Üks mäng, mida kasutaja on mänginud konkreetsel rajal|Score|Iga mängija visete arv korvi kohta|
 |**Discs**|Halda kogumit|Bag|Kasutaja ketaste kogum|
 
@@ -47,9 +47,13 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 
 | Meetod | Endpoint | Kirjeldus | Ligipääs |
 |:--------|:----------|:-----------|:-----------|
+| **GET** | `/users/me` | Päri sisse logitud kasutaja andmed | Sisse logitud |
+| **PATCH** | `/users/me` | Muuda sisse logitud kasutaja andmeid | Sisse logitud |
+| **PATCH** | `/users/:id` | Muuda teiste kasutajate andmeid | Admin |
 | **GET** | `/users` | Saa kõik kasutajad | Admin |
-| **GET** | `/users/:id` | Saa kasutaja id alusel | Sisse logitud |
-| **POST** | `/users/:id/status` | Muuda kastuaja aktiivsus staatust | Admin |
+| **GET** | `/users/:id` | Saa kasutaja id alusel | Admin |
+| **PATCH** | `/users/:id/status` | Muuda kastuaja aktiivsus staatust | Admin |
+| **DELETE** | `/users/:id` | Kasutaja soft-delete | Admin |
 
 ---
 
@@ -59,8 +63,12 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 |:--------|:----------|:-----------|:-----------|
 | **GET** | `/games` | Saa kõik mängud |Admin|
 | **GET** | `/games/myGames` | Kasutaja mängud |Sisse logitud|
-| **GET** | `/games/:id` | Saa mäng id alusel |Sisse logitud|
+| **GET** | `/games/:id` | Saa enda kasutaja mäng id alusel |Sisse logitud|
 | **POST** | `/games/add` | Lisa mäng |Sisse logitud|
+| **GET** | `/games/admin/:id` | Kõikide kasutajate mängud id alusel |Admin|
+| **DELETE** | `/games/:id` | Mängu soft-delete |Admin|
+| **PATCH** | `/games/myGames/:id/leave` | Kustuta mäng kasutaja tasemel |Sisse logitud|
+| **PATCH** | `/games/:id` | Uuenda mängu andmeid |Sisse logitud|
 
 ---
 
@@ -70,9 +78,12 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 |:--------|:----------|:-----------|:-----------|
 | **GET** | `/discs` | Saa kõik kettad |Sisse logitud|
 | **GET** | `/discs/:id` | Saa ketas id alusel |Sisse logitud|
-| **POST** | `/discs` | Lisa uus ketas |Sisse logitud|
-| **GET** | `/discs/user/:id` | Saa kettad mis kuuluvad kindlale kasutajale |Sisse logitud|
-| **POST** | `/discs/user/disc/check` | Vaata kas kasutajal (:id) on selline ketas (:id) |Admin|
+| **GET** | `/discs/me` | Saa kasutajana kõik oma kettad |Sisse logitud|
+| **POST** | `/discs` | Lisa uus ketas |Admin|
+| **GET** | `/discs/user/:id` | Saa kettad mis kuuluvad kindlale kasutajale |Admin|
+| **GET** | `/discs/user/disc/check` | Vaata kas kasutajal (:id) on selline ketas (:id) |Admin|
+| **DELETE** | `/discs/:id` | Soft-delete kettale |Admin|
+| **PATCH** | `/discs/:id` | Muuda ühe ketta andmeid |Admin|
 
 ---
 
@@ -80,9 +91,11 @@ Alljärgnevad tabelid kirjeldavad projekti erinevate ressursside REST API endpoi
 
 | Meetod | Endpoint | Kirjeldus | Ligipääs |
 |:--------|:----------|:-----------|:----------|
-| **GET** | `/courses` | Saa kõik rajad |Sisse logitud|
-| **GET** | `/courses/:id` | Saa rada id alusel |Sisse logitud|
-| **POST** | `/courses` | Lisa uus rada | Sisse logitud |
+| **GET** | `/courses` | Saa kõik rajad | Avalik |
+| **GET** | `/courses/:id` | Saa rada id alusel | Avalik |
+| **POST** | `/courses` | Lisa uus rada | Sisse logitud & Admin |
+| **DELETE** | `/courses/:id` | Soft-delete rada | Sisse logitud & Admin |
+| **PATCH** | `/courses/:id` | Uuenda raja andmeid | Sisse logitud & Admin |
 
 ---
 
