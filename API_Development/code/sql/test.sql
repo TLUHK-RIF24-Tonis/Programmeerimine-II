@@ -109,7 +109,7 @@ INSERT INTO users (id, username, email, password_hash, active, user_role) VALUES
   (3, 'SuvalineTegelane', 'tegin2ra@gmail.com',     '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', TRUE, 'user'),
   (4, 'Kangutaja',        'kangutaja123@yahoo.com', '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', TRUE, 'user'),
   (5, 'RadaRebane',       'rada.rebane@gmail.com',  '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', TRUE, 'user'),
-  (6, 'ViskeVana',        'viskevana@gmail.com',    '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', TRUE, 'user'),
+  (6, 'ViskeVana',        'viskevana@gmail.com',    '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', FALSE, 'user'),
   (7, 'RingiRändur',      'rändur77@mail.com',      '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', TRUE, 'user'),
   (8, 'PuttiPro',         'puttipro@yahoo.com',     '$2b$10$RDwYx9u29O5mQpyTFfys0uQb9wEyuNLcP8E/cNFF3814JEWUp1AGa', TRUE, 'user');
 

@@ -44,19 +44,20 @@ const userStatus = async ( req: Request, res: Response, next: NextFunction ) => 
         const user = await userService.getUserById(id);
 
         if (!user) {
-            throw new CustomError(`User with this id: ${id} was not found!`, 403)
+            throw new CustomError(`User with this id: ${id} was not found!`, 404)
         }
 
-        const changeStatus = await userService.changeUserStatus(id);
+        const { active } = req.body
 
-        if (!changeStatus.active) {
-            throw new CustomError(`${changeStatus.username} is not active!`, 403)
-        } else { 
+        if (typeof active !== 'boolean') {
+            throw new CustomError('Active must be boolean!', 400)
+        }
+        const updated = await userService.changeUserStatus(id, active)
+
         return res.status(200).json({
             success: true,
-            message: `${changeStatus.username} is active `
+            message: `User ${active ? 'activated' : 'deactivated'}`
         })
-        }
     } catch ( error ) {
         return next(error);
     }
@@ -98,11 +99,12 @@ const deleteUser = async ( req: Request, res: Response, next: NextFunction ) => 
     try {
         const id = Number( req.params.id );
 
-        const deleted = await userService.deleteUser( id );
+        const user = await userService.getUserById( id );
 
-        if ( !deleted ) {
+        if ( !user ) {
             throw new CustomError(`User with ID: ${id} not found!`, 404);
         }
+        await userService.deleteUser( id );
 
         return res.status(204).send();
     } catch ( error ) {

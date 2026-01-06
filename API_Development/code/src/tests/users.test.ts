@@ -166,4 +166,79 @@ describe('Users controller', () => {
         expectError(res, 403);
        });
     });
+    describe('GET /users/:id (admin)', () => {
+       it('Returns status 404 if no user is found', async () =>{
+        const res = await request(app)
+            .get('/users/500')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectError(res, 404);
+       });
+        it('Returns status 200 and user info whose id it is', async () =>{
+        const res = await request(app)
+            .get('/users/2')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectSuccess(res, 200);
+       });
+        it('Returns status 403 and error message user has no privleges', async () =>{
+        const res = await request(app)
+            .get('/users/2')
+            .set('Authorization', `Bearer ${userToken}`)
+
+        expectError(res, 403);
+       });
+    });
+    describe('PATCH /users/:id/status (admin)', () => {
+       it('Returns status 404 if no user is found', async () =>{
+        const res = await request(app)
+            .patch('/users/500/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ "active": false });
+
+        expectError(res, 404);
+       });
+        it('Returns status 200 and message user is active', async () =>{
+        const res = await request(app)
+            .patch('/users/2/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({});
+
+        expectError(res, 400);
+       });
+        it('Returns 200 and deactivates user', async () => {
+        const res = await request(app)
+            .patch('/users/2/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ active: false });
+
+        expectSuccess(res, 200);
+        expect(res.body.message).to.be.string('User deactivated');
+       });
+       it('Returns 200 and activates user', async () => {
+        const res = await request(app)
+            .patch('/users/2/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ active: true });
+
+        expectSuccess(res, 200);
+        expect(res.body.message).to.be.string('User activated');
+        });
+    });
+    describe('DELETE /users/:id (for admin to soft-delete)', () => {
+       it('Returns status 404 if no user is found', async () =>{
+        const res = await request(app)
+            .delete('/users/500')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectError(res, 404);
+       });
+        it('Returns status 204 if succesful soft delete', async () =>{
+        const res = await request(app)
+            .delete('/users/7')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expect(res.status).to.equal(204);
+        });
+    });
 });
