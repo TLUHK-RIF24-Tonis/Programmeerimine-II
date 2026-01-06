@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import request from 'supertest';
 import app from '../app';
 import createTestUser from './helpers/factories';
-import { expectSuccess, expectError, expectToken } from './helpers/expecters'
+import { expectSuccess, expectError, expectToken } from './helpers/expecters';
 import pool from '../database';
 import * as jwt from 'jsonwebtoken';
 

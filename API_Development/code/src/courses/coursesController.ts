@@ -10,7 +10,7 @@ const getAllCourses = async (req: Request, res: Response, next: NextFunction) =>
             return res.status(200).json({
                 success: true,
                 message: 'No courses found!',
-                courses: []
+                courses
             })
         };
 
@@ -31,7 +31,7 @@ const getCourseById = async (req: Request, res: Response, next: NextFunction) =>
         const course = await coursesService.getCourseById(id);
 
         if (!course) {
-            throw new CustomError(`Atleast one field must be provided`, 404);
+            throw new CustomError(`Course with id: ${id} not found!`, 404);
         };
 
         return res.status(200).json ({
@@ -104,7 +104,13 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
             throw new CustomError(`Missing input: Course name, -Location, hole number or PAR`, 400);
         }
 
-        const updated = await coursesService.updateCourse ( id, { course_name, course_location, holes, par } );
+        const updates: any = {};
+        if ( course_name !== undefined ) updates.course_name = course_name;
+        if ( course_location !== undefined ) updates.course_location = course_location;
+        if ( holes !== undefined ) updates.holes = holes;
+        if ( par !== undefined ) updates.par = par
+
+        const updated = await coursesService.updateCourse ( id, updates );
 
         if ( !updated ) {
             throw new CustomError(`Course(${id}) does not exist!`, 404);
