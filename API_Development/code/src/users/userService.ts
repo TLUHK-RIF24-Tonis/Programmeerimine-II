@@ -52,7 +52,8 @@ const updateUser = async ( id: number, updates: Partial<Omit<IUsers, 'id'>> ): P
     if (
         updates.email === undefined &&
         updates.username === undefined &&
-        updates.password === undefined
+        updates.password === undefined &&
+        updates.role === undefined
     ) {
         return getUserById(id);
     }

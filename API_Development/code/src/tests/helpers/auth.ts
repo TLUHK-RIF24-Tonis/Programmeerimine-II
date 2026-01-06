@@ -7,3 +7,4 @@ export async function loginUser(user: any) {
   expectToken(res);
   return res.body.token as string;
 }
+

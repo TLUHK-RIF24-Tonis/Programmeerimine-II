@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
             "PATCH /users/:id": 'Change user data',
             "GET /users": 'Get all users',
             "GET /users/:id": 'Get user by ID',
-            "POST /users/:id/status": 'Change user active status'
+            "PATCH /users/:id/status": 'Change user active status'
             },
             GAMES:{
             "GET /games/myGames": 'Get logged in user specific games',
