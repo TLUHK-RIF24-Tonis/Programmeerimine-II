@@ -6,11 +6,11 @@ const getAllCourses = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const courses = await coursesService.getAllCourses();
 
-        if (!courses) {
+        if (courses.length === 0) {
             return res.status(200).json({
                 success: true,
                 message: 'No courses found!',
-                courses
+                courses: []
             })
         };
 

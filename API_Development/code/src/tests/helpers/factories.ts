@@ -1,4 +1,4 @@
-function createTestUser(role: 'user' | 'admin' = 'user') {
+export function createTestUser(role: 'user' | 'admin' = 'user') {
     const id = Date.now() + Math.random();
 
     return {
@@ -7,5 +7,3 @@ function createTestUser(role: 'user' | 'admin' = 'user') {
         password: '12345',
     };
 }
-
-export default createTestUser;

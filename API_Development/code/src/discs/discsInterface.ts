@@ -18,4 +18,9 @@ interface IUserDiscs {
     addedAt: Date;
 };
 
-export { IDiscs, IUserDiscs };
+interface UserDiscsRow extends RowDataPacket {
+    user_id: number;
+    discs: IDiscs[];
+}
+
+export { IDiscs, IUserDiscs, UserDiscsRow };

@@ -6,7 +6,6 @@ import userRouter from './users/usersRouter';
 import authController from './auth/authController';
 import isLoggedIn from './auth/isLoggedMiddleware';
 import usersController from './users/usersController';
-import config from './config';
 import errorMiddleware from './general/errorMiddleware';
 import notFoundMiddleware from './general/notFoundMiddleware';
 
@@ -42,6 +41,7 @@ app.get('/', (req, res) => {
             "GET /discs/:id": 'Get disc by ID',
             "GET /discs/me": 'Get all user discs',
             "POST /discs": 'Add new disc',
+            "POST /discs/add/:id": 'Add disc to your collection',
             "GET /discs/user/:id": 'Get one specific user discs',
             "POST /discs/user/disc/check": 'Check if user(:id) has this disc(:id)',
             "DELETE /discs/:id": 'Soft-delete disc',

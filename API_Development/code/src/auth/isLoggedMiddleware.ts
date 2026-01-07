@@ -25,6 +25,7 @@ const isLoggedIn = ( req: Request, res: Response, next: NextFunction ) => {
         }
 
         res.locals.user = payload;
+
         return next();
         
     } catch ( error ) {

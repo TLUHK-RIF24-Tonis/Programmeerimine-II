@@ -7,7 +7,7 @@ const getAllDiscs = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const discs = await discsService.getAllDiscs();
 
-        if ( !discs ) {
+        if ( discs.length === 0 ) {
             return res.status(200).json({
                 success: true,
                 message: `There are no discs!`,
@@ -72,7 +72,29 @@ const getUserDiscs = async (req: Request, res: Response, next: NextFunction) => 
 
 const getMyDiscs = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userId = res.locals.user.id;
+
+        let userId: number;
+        console.log('locals.user:', res.locals.user);
+
+        if ( req.query.userId !== undefined ) {
+            if (res.locals.user.role !== 'admin') {
+                throw new CustomError(`Forbidden`, 403)
+            }
+            
+            userId = Number(req.query.userId);
+
+            if (!Number.isInteger(userId) || userId <= 0) {
+                throw new CustomError(`Invalid userId on query parameter`, 400)
+            }
+        } else {
+            userId = Number(res.locals.user.id);
+
+        console.log(userId)
+
+            if (!Number.isInteger(userId) || userId <= 0) {
+                throw new CustomError(`Invalid user id  in token`, 401)
+            }
+        }
 
         const userDiscs = await discsService.getUserDiscs(userId);
 
@@ -86,21 +108,32 @@ const getMyDiscs = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-const userHaveDisc = (req: Request, res: Response, next: NextFunction) => {
+const userHaveDisc = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { userId, discId } = req.body
 
-        const isDisc = discsService.getDiscById(discId);
-        const isUser = userService.getUserById(userId);
-
-        if (!isDisc || !isUser) {
-            throw new CustomError(`Missing user or disc, please check if both exists!`, 400);
+        if (
+            typeof userId !== 'number' || typeof discId !== 'number' ||
+            userId <= 0 || discId <= 0 
+        ) {
+            throw new CustomError(`Invalid input for: user ID or disc ID, please validate that ID is a number!`, 400);
         }
 
-        const hasDisc = discsService.userOwnDisc(userId, discId)
+        const isDisc = await discsService.getDiscById(discId);
+        const isUser = await userService.getUserById(userId);
+
+        if (!isDisc) {
+            throw new CustomError(`This disc with id: ${discId} does not exist!`, 404);
+        }
+
+        if (!isUser) {
+            throw new CustomError(`This user with id: ${userId} does not exist`, 404);
+        }
+
+        const hasDisc = await discsService.userOwnDisc(userId, discId)
 
         if (!hasDisc) {
-            throw new CustomError(`User id: ${userId} does not own this disc.`, 404);
+            throw new CustomError(`User id: ${userId} does not own this disc.`, 400);
         }
         return res.status(200).json ({
             success: true,
@@ -115,34 +148,39 @@ const createDisc = async ( req: Request, res: Response, next: NextFunction ) => 
     try {
             const { brand, model, type, speed, glide, turn, fade } = req.body
 
-        if ( !brand || !model || !type ) {
+        if ( 
+            (brand === undefined || brand === null || brand === '') ||
+           (model === undefined || model === null || model === '') ||
+            (type === undefined || type === null || type === '')
+        ) {
             throw new CustomError(`Please insert disc brand, model or type!`, 400);
         }
 
-        if ( speed == null || glide == null || turn == null || fade == null ) {
+        if (
+            (speed == null || speed === null || speed === '') ||
+            (glide == null || glide === null || glide === '') ||
+            (turn == null || turn === null || turn === '') ||
+            (fade == null || fade === null || fade === '')
+        ) {
             throw new CustomError(`Please insert all flight numbers ( speed, glide, turn, fade ) before adding disc!`, 400);
         }
 
         const result = await discsService.createDisc(
             brand, model, type, speed, glide, turn, fade
         );
-        
-        if ( !result.success ) {
-            throw new CustomError(`Please insert all flight numbers ( speed, glide, turn, fade ) before adding disc!`, 409);
-        } else {
-            return res.status(201).json ({
-                success: true,
-                message: 'Disc created!',
-                discId: result.discId,
-                brand,
-                model,
-                type,
-                speed,
-                glide,
-                turn,
-                fade
-            });
-        }
+
+        return res.status(201).json ({
+            success: true,
+            message: 'Disc created!',
+            discId: result.discId,
+            brand,
+            model,
+            type,
+            speed,
+            glide,
+            turn,
+            fade
+        });
     } catch ( error ) {
         return next(error);
     }
@@ -152,10 +190,16 @@ const deleteDisc = async ( req: Request, res: Response, next: NextFunction ) => 
     try {
         const discId = Number( req.params.id );
 
+        const disc = await discsService.getDiscById(discId);
+
+        if ( !disc ) {
+            throw new CustomError(`Disc with ID: ${discId} not found`, 404);
+        }
+
         const deleted = await discsService.deleteDisc(discId)
 
         if ( !deleted ) {
-            throw new CustomError(`Disc with ID: ${discId} not found`, 404);
+            throw new CustomError(`Disc with id: ${discId} already deleted`, 400);
         }
 
         return res.status(204).send();
@@ -239,4 +283,43 @@ const updateDisc = async ( req: Request, res: Response, next: NextFunction ) => 
     }
 };
 
-export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc, deleteDisc, getMyDiscs, updateDisc };
+const addMyDisc = async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+
+        const userId = Number(res.locals.user.id);
+        const discId = Number(req.params.id);
+
+        if ( !Number.isInteger(userId) || userId <= 0 ) {
+            throw new CustomError(`Invalid user in token!`, 401);
+        }
+
+        if ( !Number.isInteger(discId) || discId <= 0 ) {
+            throw new CustomError(`Invalid disc id!`, 404);
+        }
+
+        const disc = await discsService.getDiscById(discId);
+
+        if (!disc) {
+            throw new CustomError(`Disc with id ${discId} not found`, 404);
+        }
+
+        const user = await userService.getUserById(userId);
+
+        if (!user) {
+            throw new CustomError(`User with id ${userId} not found`, 404);
+        }
+
+        await discsService.addMyDisc( userId, discId );
+
+        return res.status(200).json({
+            success: true,
+            message: `Disc added to your collection!`,
+        })
+
+
+    } catch ( error ) {
+        return next(error);
+    }
+}
+
+export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc, deleteDisc, getMyDiscs, updateDisc, addMyDisc };

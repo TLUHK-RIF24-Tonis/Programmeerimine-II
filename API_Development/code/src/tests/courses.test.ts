@@ -1,47 +1,24 @@
 import { expect } from 'chai';
 import request from 'supertest';
 import app from '../app';
-import createTestUser from './helpers/factories';
-import { expectSuccess, expectError, expectToken } from './helpers/expecters';
-import * as jwt from 'jsonwebtoken';
+import { expectSuccess, expectError, loginUser, createTestUser } from './helpers';
 import pool from '../database';
 
-let fakeToken!: string;
 let adminToken!: string;
-let userToken!: string;
 let courseId: number;
 
-const newUser = createTestUser('user');
 const adminUser = createTestUser('admin');
 
 before(async () => {
 
-    await request(app).post('/users').send(adminUser);
+    await request(app)
+    .post('/users')
+    .send(adminUser);
     await pool.query(`UPDATE users SET user_role = 'admin' WHERE email = ?`, [adminUser.email]);
 
-    const adminRes = await request(app)
-    .post('/auth/login')
-    .send(adminUser);
+    const adminRes = await loginUser(adminUser)
 
-    expect(adminRes.status).to.equal(200);
-
-    expectToken(adminRes);
-    adminToken = adminRes.body.token;
-
-    await request(app).post('/users').send(newUser)
-
-    const userRes = await request(app)
-    .post('/auth/login')
-    .send(newUser);
-
-    expect(userRes.status).to.equal(200);
-    expectToken(userRes);
-    userToken = userRes.body.token;
-
-    fakeToken = jwt.sign(
-       { id: 12345 },
-       process.env.JWT_SECRET
-    );
+    adminToken = adminRes;
 });
 
 describe('Courses controller', () => {
@@ -55,16 +32,19 @@ describe('Courses controller', () => {
             expectSuccess(res, 200);
         });
     });
-    describe('GET /courses when no courses exist', () => {
+    describe('GET /courses when course is empty', () => {
 
         beforeEach(async () => {
             await pool.query('DELETE FROM courses');
         });
 
-        it('Should return 200 and empty array', async () =>{
+        it('Should return 200 and message with an empty courses array', async () =>{
 
         const res = await request(app)
             .get('/courses');
+
+        expect(res.body).to.have.property('courses');
+        expect(res.body.courses).to.be.an('array');
 
         expectSuccess(res, 200);
         });
@@ -173,7 +153,15 @@ describe('Courses controller', () => {
 
         courseId = result.insertId
         });
+        it('Should return 200 if course update went sucessfuly', async () =>{
 
+        const res = await request(app)
+        .patch(`/courses/${courseId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send( { course_name: 'Ajutine mingi suvaline rada'} );
+
+        expectSuccess(res, 200);
+        });
         it('Should return 400 if course input data is missing', async () =>{
 
         const res = await request(app)

@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import request from 'supertest';
 import app from '../app';
-import createTestUser from './helpers/factories';
-import { expectSuccess, expectError, expectToken } from './helpers/expecters';
+import { expectSuccess, expectError, createTestUser, loginUser } from './helpers';
 import pool from '../database';
 import * as jwt from 'jsonwebtoken';
+import { runQuery } from '../createDatabase';
 
 let fakeToken!: string;
 let adminToken!: string;
@@ -15,27 +15,20 @@ const adminUser = createTestUser('admin');
 
 before(async () => {
 
-    await request(app).post('/users').send(adminUser);
+    await request(app)
+    .post('/users')
+    .send(adminUser);
     await pool.query(`UPDATE users SET user_role = 'admin' WHERE email = ?`, [adminUser.email]);
 
-    const adminRes = await request(app)
-    .post('/auth/login')
-    .send(adminUser);
+    const adminRes = await loginUser(adminUser)
 
-    expect(adminRes.status).to.equal(200);
-
-    expectToken(adminRes);
-    adminToken = adminRes.body.token;
+    adminToken = adminRes;
 
     await request(app).post('/users').send(newUser)
 
-    const userRes = await request(app)
-    .post('/auth/login')
-    .send(newUser);
+    const userRes = await loginUser(newUser)
 
-    expect(userRes.status).to.equal(200);
-    expectToken(userRes);
-    userToken = userRes.body.token;
+    userToken = userRes;
 
     fakeToken = jwt.sign(
        { id: 12345 },

@@ -11,7 +11,7 @@ const db = mysql2.createConnection(dbConfig).promise();
 
 const statements = sqlContent.split(/;\s*$/m);
 
-async function runQuery(sql: string) {
+export async function runQuery(sql: string) {
   try {
     console.log('Running query');
     await db.query(sql);

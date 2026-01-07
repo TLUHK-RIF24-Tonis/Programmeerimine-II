@@ -137,4 +137,27 @@ const getAllDiscs = async (): Promise<IDiscs[]> => {
     return discs;
 };
 
-export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc, deleteDisc, updateDisc };
+const addMyDisc = async ( userId: number, discId: number ): Promise<{ success: boolean, message: string, discId?: number }> => {
+
+    const [ exist ] = await pool.query<RowDataPacket[]>(
+        "SELECT user_id, disc_id FROM user_discs WHERE user_id = ? AND disc_id = ?", [userId, discId]
+    )
+    
+    if ( exist.length > 0 ) {
+        return {
+            success: false,
+            message: 'This is already in collection'
+        };
+    }
+
+    const [ add ] = await pool.query<ResultSetHeader>(
+        "INSERT INTO user_discs (user_id, disc_id) VALUES (?, ?)", [ userId, discId ]
+    );
+
+    return {
+        success: true,
+        message: 'Disc added to collection',
+    };
+};
+
+export default { getUserDiscs, userOwnDisc, getAllDiscs, getDiscById, createDisc, deleteDisc, updateDisc, addMyDisc };
