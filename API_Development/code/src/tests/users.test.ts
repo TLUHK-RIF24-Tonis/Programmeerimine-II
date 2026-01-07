@@ -4,7 +4,6 @@ import app from '../app';
 import { expectSuccess, expectError, createTestUser, loginUser } from './helpers';
 import pool from '../database';
 import * as jwt from 'jsonwebtoken';
-import { runQuery } from '../createDatabase';
 
 let fakeToken!: string;
 let adminToken!: string;
