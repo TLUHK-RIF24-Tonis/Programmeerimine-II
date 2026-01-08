@@ -52,7 +52,8 @@ const userStatus = async ( req: Request, res: Response, next: NextFunction ) => 
         if (typeof active !== 'boolean') {
             throw new CustomError('Active must be boolean!', 400)
         }
-        const updated = await userService.changeUserStatus(id, active)
+        
+        await userService.changeUserStatus(id, active)
 
         return res.status(200).json({
             success: true,
@@ -148,7 +149,7 @@ const updateUser = async ( req: Request, res: Response, next: NextFunction ) => 
         if ( password !== undefined ) updates.password = password;
         if ( role !== undefined ) updates.role = role
         
-        const updated = await userService.updateUser( id, { updates })
+        const updated = await userService.updateUser( id, updates)
 
         if ( !updated ) {
             throw new CustomError(`User(${id}) does not exist!`, 404);
@@ -174,7 +175,7 @@ const updateSelf = async ( req: Request, res: Response, next: NextFunction ) => 
             username === undefined &&
             password === undefined
         ) {
-            throw new CustomError(`Provide at least one field to updated`, 400);
+            throw new CustomError(`Provide at least one field to update`, 400);
         }
 
         const updated = await userService.updateUser(userId, { email, username, password });

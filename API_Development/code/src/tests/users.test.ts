@@ -4,6 +4,7 @@ import app from '../app';
 import { expectSuccess, expectError, createTestUser, loginUser } from './helpers';
 import pool from '../database';
 import * as jwt from 'jsonwebtoken';
+import { ResultSetHeader } from 'mysql2';
 
 let fakeToken!: string;
 let adminToken!: string;
@@ -47,7 +48,7 @@ describe('Users controller', () => {
 
         expectSuccess(res, 201);
        });
-        it('Should fail when requied field are not provided and return status 400', async () =>{
+        it('Should fail when required field are not provided and return status 400', async () =>{
             const res = await request(app)
                 .post('/users')
                 .send({ email: 'random@test.com' });
@@ -134,10 +135,16 @@ describe('Users controller', () => {
         expectError(res, 404);
        });
         it('Returns status 200 and user profile successfuly updated', async () =>{
+
+            const [user] = await pool.query<ResultSetHeader>("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+                ["yepThatsMe", "yepThatsMe@mail.com", "1234" ])
+
+            const userId = user.insertId
+
         const res = await request(app)
-            .patch('/users/4')
+            .patch(`/users/${userId}`)
             .set('Authorization', `Bearer ${adminToken}`)
-            .send({ email: 'suvalineJama@gmail.com' });
+            .send({ email: 'SomethingVeryRandom@gmail.com' });
 
         expectSuccess(res, 200);
        });

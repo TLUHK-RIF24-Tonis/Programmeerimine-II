@@ -60,12 +60,13 @@ const updateUser = async ( id: number, updates: Partial<Omit<IUsers, 'id'>> ): P
     }
 
     const hashedPassword = updates.password !== undefined 
-                        ?hashService.hash(updates.password) : null;
+                        ? await hashService.hash(updates.password) : null;
     
     const params: ( string | number | null )[] = [
         updates.email ?? null,
         hashedPassword,
         updates.username ?? null,
+        updates.role ?? null,
         id
     ];
 
@@ -75,6 +76,7 @@ const updateUser = async ( id: number, updates: Partial<Omit<IUsers, 'id'>> ): P
             SET email = COALESCE(?, email),
                 password_hash = COALESCE(?, password_hash),
                 username = COALESCE(?, username),
+                user_role = COALESCE(?, user_role),
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
                 AND deleted_at IS NULL;

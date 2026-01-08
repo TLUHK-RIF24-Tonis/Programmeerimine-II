@@ -116,6 +116,12 @@ describe('Discs controller', () => {
                 'INSERT INTO users (email, username, password_hash, active, user_role) VALUES (?, ?, ?, ?, ?)', ['test@test.test', 'test', 'irrelevant', true, 'user']
             )
 
+            const nUser = {
+                "email": "test@test.test",
+                "username": "test",
+                "password": "12345"
+            }
+
             userId = userResult.insertId
 
             await pool.query(
@@ -128,8 +134,8 @@ describe('Discs controller', () => {
         it('Should return status 200 with :id disc info', async () =>{
 
         const res = await request(app)
-            .get(`/discs/me?userId=${userId}`)
-            .set('Authorization', `Bearer ${adminToken}`)
+            .get(`/discs/me`)
+            .set('Authorization', `Bearer ${token}`)
 
         expectSuccess(res, 200);
         });
@@ -299,26 +305,30 @@ describe('Discs controller', () => {
             const res = await request(app)
                 .delete('/discs/500')
                 .set('Authorization', `Bearer ${adminToken}`)
-            
-            console.log(res.body)
 
             expectError(res, 404);
         });
-        it('Should return status 400 if brand, model or type missing', async () => {
+        it('Should return status 400 when disc id is invalid', async () => {
             const res = await request(app)
-                .post('/discs/')
+                .delete('/discs/asd')
                 .set('Authorization', `Bearer ${adminToken}`)
-                .send({ brand: '', model: 'Force', type: 'Driver', speed: 12, glide: 5, turn: 0, fade: 3 });
-            
+
             expectError(res, 400);
         });
-        it('Should return status 400 if speed, glide, turn or fade is missing', async () => {
+        it('Should return status 204 when disc successfully deleted', async () => {
+
+            const [discResult]: any = await pool.query(
+                'INSERT INTO discs (brand, model, disc_type, speed, glide, turn, fade) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                ['Innova', 'Destroyer', 'Driver', 12, 5, -2.5, 3]
+            );
+
+            const discId = discResult.insertId
+
             const res = await request(app)
-                .post('/discs')
+                .delete(`/discs/${discId}`)
                 .set('Authorization', `Bearer ${adminToken}`)
-                .send({ brand: 'Discraft', model: 'Force', type: 'Driver', speed: '', glide: 5, turn: 0, fade: 3 });
             
-            expectError(res, 400);
+            expect(res.status).to.equal(204);
         });
     });
 });

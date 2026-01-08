@@ -73,27 +73,10 @@ const getUserDiscs = async (req: Request, res: Response, next: NextFunction) => 
 const getMyDiscs = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        let userId: number;
-        console.log('locals.user:', res.locals.user);
+        const userId = Number(res.locals.user.id);
 
-        if ( req.query.userId !== undefined ) {
-            if (res.locals.user.role !== 'admin') {
-                throw new CustomError(`Forbidden`, 403)
-            }
-            
-            userId = Number(req.query.userId);
-
-            if (!Number.isInteger(userId) || userId <= 0) {
-                throw new CustomError(`Invalid userId on query parameter`, 400)
-            }
-        } else {
-            userId = Number(res.locals.user.id);
-
-        console.log(userId)
-
-            if (!Number.isInteger(userId) || userId <= 0) {
-                throw new CustomError(`Invalid user id  in token`, 401)
-            }
+        if (!Number.isInteger(userId) || userId <= 0) {
+            throw new CustomError("Invalid user id in token", 401);
         }
 
         const userDiscs = await discsService.getUserDiscs(userId);
@@ -133,7 +116,7 @@ const userHaveDisc = async (req: Request, res: Response, next: NextFunction) => 
         const hasDisc = await discsService.userOwnDisc(userId, discId)
 
         if (!hasDisc) {
-            throw new CustomError(`User id: ${userId} does not own this disc.`, 400);
+            throw new CustomError(`User id: ${userId} does not own this disc.`, 404);
         }
         return res.status(200).json ({
             success: true,
@@ -157,10 +140,10 @@ const createDisc = async ( req: Request, res: Response, next: NextFunction ) => 
         }
 
         if (
-            (speed == null || speed === null || speed === '') ||
-            (glide == null || glide === null || glide === '') ||
-            (turn == null || turn === null || turn === '') ||
-            (fade == null || fade === null || fade === '')
+            (speed === undefined || speed === null || speed === '') ||
+            (glide === undefined || glide === null || glide === '') ||
+            (turn === undefined || turn === null || turn === '') ||
+            (fade === undefined || fade === null || fade === '')
         ) {
             throw new CustomError(`Please insert all flight numbers ( speed, glide, turn, fade ) before adding disc!`, 400);
         }
@@ -190,6 +173,10 @@ const deleteDisc = async ( req: Request, res: Response, next: NextFunction ) => 
     try {
         const discId = Number( req.params.id );
 
+        if ( Number.isNaN(discId) ) {
+            throw new CustomError('Invalid disc ID', 400);
+        } 
+
         const disc = await discsService.getDiscById(discId);
 
         if ( !disc ) {
@@ -198,11 +185,11 @@ const deleteDisc = async ( req: Request, res: Response, next: NextFunction ) => 
 
         const deleted = await discsService.deleteDisc(discId)
 
-        if ( !deleted ) {
+        if ( deleted === false ) {
             throw new CustomError(`Disc with id: ${discId} already deleted`, 400);
         }
 
-        return res.status(204).send();
+        return res.sendStatus(204);
     } catch ( error ) {
         return next(error);
     }
@@ -314,12 +301,11 @@ const addMyDisc = async ( req: Request, res: Response, next: NextFunction ) => {
         return res.status(200).json({
             success: true,
             message: `Disc added to your collection!`,
-        })
-
+        });
 
     } catch ( error ) {
         return next(error);
     }
-}
+};
 
 export default { getAllDiscs, getDiscById, getUserDiscs, userHaveDisc, createDisc, deleteDisc, getMyDiscs, updateDisc, addMyDisc };

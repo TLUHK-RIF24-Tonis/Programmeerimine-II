@@ -150,7 +150,7 @@ const addMyDisc = async ( userId: number, discId: number ): Promise<{ success: b
         };
     }
 
-    const [ add ] = await pool.query<ResultSetHeader>(
+    await pool.query<ResultSetHeader>(
         "INSERT INTO user_discs (user_id, disc_id) VALUES (?, ?)", [ userId, discId ]
     );
 

@@ -108,7 +108,7 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
         if ( course_name !== undefined ) updates.course_name = course_name;
         if ( course_location !== undefined ) updates.course_location = course_location;
         if ( holes !== undefined ) updates.holes = holes;
-        if ( par !== undefined ) updates.par = par
+        if ( par !== undefined ) updates.par = par;
 
         const updated = await coursesService.updateCourse ( id, updates );
 
