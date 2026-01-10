@@ -7,6 +7,7 @@ const router = Router();
 router.get('/', discsController.getAllDiscs);
 router.get('/:id', discsController.getDiscById);
 router.get('/me', discsController.getMyDiscs);
+router.post('/add/:id', discsController.addMyDisc);
 router.post('/', isAdmin, discsController.createDisc);
 router.get("/user/:id", isAdmin, discsController.getUserDiscs);
 router.get("/user/disc/check", isAdmin, discsController.userHaveDisc);

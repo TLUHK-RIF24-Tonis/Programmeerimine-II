@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx watch src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "tsx src/createDatabase.ts",
+    "test": "cross-env NODE_ENV=test mocha -r tsx src/tests/*.test.ts --exit",
+    "coverage": "nyc npm test"
   },
   "keywords": [],
   "author": "",
@@ -12,9 +14,16 @@
   "description": "",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/chai": "^5.2.3",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.1",
+    "@types/supertest": "^6.0.3",
+    "chai": "^6.2.2",
+    "cross-env": "^10.1.0",
+    "mocha": "^11.7.5",
+    "supertest": "^7.1.4",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   },
@@ -23,6 +32,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.15.3"
+    "mysql2": "^3.15.3",
+    "nyc": "^17.1.0"
   }
 }

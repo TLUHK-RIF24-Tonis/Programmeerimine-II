@@ -1,0 +1,243 @@
+import { expect } from 'chai';
+import request from 'supertest';
+import app from '../app';
+import { expectSuccess, expectError, createTestUser, loginUser } from './helpers';
+import pool from '../database';
+import * as jwt from 'jsonwebtoken';
+import { ResultSetHeader } from 'mysql2';
+
+let fakeToken!: string;
+let adminToken!: string;
+let userToken!: string;
+
+const newUser = createTestUser('user');
+const adminUser = createTestUser('admin');
+
+before(async () => {
+
+    await request(app)
+    .post('/users')
+    .send(adminUser);
+    await pool.query(`UPDATE users SET user_role = 'admin' WHERE email = ?`, [adminUser.email]);
+
+    const adminRes = await loginUser(adminUser)
+
+    adminToken = adminRes;
+
+    await request(app).post('/users').send(newUser)
+
+    const userRes = await loginUser(newUser)
+
+    userToken = userRes;
+
+    fakeToken = jwt.sign(
+       { id: 12345 },
+       process.env.JWT_SECRET
+    );
+});
+
+describe('Users controller', () => {
+
+    describe('POST /users', () => {
+       it('Should create user and return status 201', async () =>{
+        const user = createTestUser();
+
+        const res = await request(app)
+            .post('/users')
+            .send(user);
+
+        expectSuccess(res, 201);
+       });
+        it('Should fail when required field are not provided and return status 400', async () =>{
+            const res = await request(app)
+                .post('/users')
+                .send({ email: 'random@test.com' });
+
+            expectError(res, 400);
+        });
+       it('Should fail when user already exists and return status 400', async () =>{
+            const user = createTestUser();
+
+            await request(app).post('/users').send(user);
+
+            const res = await request(app)
+                .post('/users')
+                .send(user);
+
+            expectError(res, 400);
+       });
+    });
+    describe('GET /users/me', () => {
+       it('Returns status 404 and error message user with this id does not exist', async () =>{
+        const res = await request(app)
+            .get('/users/me')
+            .set('Authorization', `Bearer ${fakeToken}`);
+
+        expectError(res, 404);
+       });
+       it('Returns current user info and success status 200', async () =>{
+        const res = await request(app)
+            .get('/users/me')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expectSuccess(res, 200);
+       });
+    });
+    describe('PATCH /users/me', () => {
+       it('Returns status 400 if no fields are provided', async () =>{
+        const res = await request(app)
+            .patch('/users/me')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({});
+
+        expectError(res, 400);
+       });
+       it('Returns status 404 if user does not exist', async () =>{
+        const res = await request(app)
+            .patch('/users/me')
+            .set('Authorization', `Bearer ${fakeToken}`)
+            .send({ email: 'suvalineJama@gmail.com' });
+
+        expectError(res, 404);
+       });
+        it('Returns status 200 and user updated profile', async () =>{
+        const res = await request(app)
+            .patch('/users/me')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ email: 'suvalineJama@gmail.com' });
+
+        expectSuccess(res, 200);
+       });
+    });
+    describe('PATCH /users/me (admin)', () => {
+       it('Returns status 400 if no changes are inputed', async () =>{
+        const res = await request(app)
+            .patch('/users/4')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ email: undefined, username: undefined, password: undefined, role: undefined });
+
+        expectError(res, 400);
+       });
+        it('Returns status 403 if user is not admin', async () =>{
+        const res = await request(app)
+            .patch('/users/4')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ email: undefined, username: undefined, password: undefined, role: undefined });
+
+        expectError(res, 403);
+       });
+       it('Returns status 404 if user does not exist', async () =>{
+        const res = await request(app)
+            .patch('/users/20')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ email: 'ajutine@meil.com' });
+
+        expectError(res, 404);
+       });
+        it('Returns status 200 and user profile successfuly updated', async () =>{
+
+            const [user] = await pool.query<ResultSetHeader>("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+                ["yepThatsMe", "yepThatsMe@mail.com", "1234" ])
+
+            const userId = user.insertId
+
+        const res = await request(app)
+            .patch(`/users/${userId}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ email: 'SomethingVeryRandom@gmail.com' });
+
+        expectSuccess(res, 200);
+       });
+    });
+    describe('GET /users (admin)', () => {
+       it('Returns status 200 and list of all users', async () =>{
+        const res = await request(app)
+            .get('/users')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectSuccess(res, 200);
+       });
+        it('Returns status 403 and error message user has no privleges', async () =>{
+        const res = await request(app)
+            .get('/users')
+            .set('Authorization', `Bearer ${userToken}`)
+
+        expectError(res, 403);
+       });
+    });
+    describe('GET /users/:id (admin)', () => {
+       it('Returns status 404 if no user is found', async () =>{
+        const res = await request(app)
+            .get('/users/500')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectError(res, 404);
+       });
+        it('Returns status 200 and user info whose id it is', async () =>{
+        const res = await request(app)
+            .get('/users/2')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectSuccess(res, 200);
+       });
+        it('Returns status 403 and error message user has no privleges', async () =>{
+        const res = await request(app)
+            .get('/users/2')
+            .set('Authorization', `Bearer ${userToken}`)
+
+        expectError(res, 403);
+       });
+    });
+    describe('PATCH /users/:id/status (admin)', () => {
+       it('Returns status 404 if no user is found', async () =>{
+        const res = await request(app)
+            .patch('/users/500/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ "active": false });
+
+        expectError(res, 404);
+       });
+        it('Returns status 200 and message user is active', async () =>{
+        const res = await request(app)
+            .patch('/users/2/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({});
+
+        expectError(res, 400);
+       });
+        it('Returns 200 and deactivates user', async () => {
+        const res = await request(app)
+            .patch('/users/2/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ active: false });
+
+        expectSuccess(res, 200);
+        expect(res.body.message).to.be.string('User deactivated');
+       });
+       it('Returns 200 and activates user', async () => {
+        const res = await request(app)
+            .patch('/users/2/status')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ active: true });
+
+        expectSuccess(res, 200);
+        expect(res.body.message).to.be.string('User activated');
+        });
+    });
+    describe('DELETE /users/:id (for admin to soft-delete)', () => {
+       it('Returns status 404 if no user is found', async () =>{
+        const res = await request(app)
+            .delete('/users/500')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expectError(res, 404);
+       });
+        it('Returns status 204 if succesful soft delete', async () =>{
+        const res = await request(app)
+            .delete('/users/7')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expect(res.status).to.equal(204);
+        });
+    });
+});

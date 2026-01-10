@@ -365,13 +365,16 @@ Päringu kehasse sisesta andmed:
 
 Seejärel kasuta üleval olevat sisselogimis juhendit ja saad ligipääsu `API`-le
 
-## 🐳DOCKERI PAIGALDAMINE  
+## 🐳DOCKERI PAIGALDAMINE ( Põhi andmebaas )  
 
 See juhend aitab sul käivatada MySQL konteineri, luua `discgolfapp` andmebaasi, laadida skeemi ja seed-andmed ning seadistada ühendus `.env` failis
 
 ### 1. Loo MySQL docker konteiner
 
 Konteineri seadistused:  
+
+**PORT 1: 3306**  
+**PORT 2: 33060**
 
 | Muutuja | Väärtus | Selgitus  
 |:--------|:----------|:-----------|  
@@ -382,7 +385,7 @@ Konteineri seadistused:
 
 ### 2. Ava konteiner ja sisene `EXEC` aknasse
 
-Logi MySQL-i:
+Logi MySQL-i tava kasutajaga:
 
 ```bash
 mysql -u disc_golfer -p
@@ -428,6 +431,7 @@ JWT_SECRET=SiiaPaneMidagiV2gaSuvalist
 SALT_ROUNDS=10
 DB_HOST=localhost
 DB_NAME=discgolfapp
+DB_TEST=test
 DB_USER=disc_golfer
 DB_PASSWORD=secret
 DB_PORT=3306
@@ -435,7 +439,7 @@ DB_PORT=3306
 
 > [!IMPORTANT] DB_PORT peab olema sama, mis Dockeris määrasid  
 
-### 7. Käivita API
+### 7. Käivita API olles terminaliga juur kaustas `src`
 
 ```bash
 npm install
@@ -447,3 +451,106 @@ Kui kõik korras näed:
 ```bash
 API is running on http://localhost:3000
 ```
+
+## 🐳DOCKERI PAIGALDAMINE ( TEST andmebaas )  
+
+See juhend aitab sul käivatada MySQL konteineri, luua `test` andmebaasi, laadida skeemi ja seed-andmed ning seadistada ühendus `.env` failis
+
+### 1. Loo MySQL docker konteiner
+
+Konteineri seadistused:  
+
+**PORT 1: 3306**  
+**PORT 2: 33060**
+
+| Muutuja | Väärtus | Selgitus  
+|:--------|:----------|:-----------|  
+| `MYSQL_DATABASE` | `test` | Luuakse andmebaas |  
+| `MYSQL_ROOT_PASSWORD` | `super-secret` | Root kasutaja parool |  
+| `MYSQL_USER` | `disc_golfer` | Tavaline MySQL kasutaja |  
+| `MYSQL_PASSWORD` | `secret` | Selle kasutaja parool |  
+
+### 2. Ava konteiner ja sisene `EXEC` aknasse
+
+Logi MySQL-i tava kasutajaga:
+
+```bash
+mysql -u disc_golfer -p
+```
+
+Sisesta parool:
+
+```bash
+secret
+```
+
+### 3. Vali andembaas
+
+```sql
+USE test;
+```
+
+### 4. Lase sisse test andmebaasi skeem
+
+Mine projekti kasutas:
+
+```bash
+sql/test.sql
+```
+
+Kopeeri selle sisu ja kleebi MySQL terminali.
+
+### 5. Loo `.env` fail API jaoks
+
+Projekti juurkasuta loo `env` fail:  
+
+```env
+PORT=3000
+JWT_SECRET=SiiaPaneMidagiV2gaSuvalist
+SALT_ROUNDS=10
+DB_HOST=localhost
+DB_NAME=discgolfapp
+DB_TEST=test
+DB_USER=disc_golfer
+DB_PASSWORD=secret
+DB_PORT=3306
+```  
+
+> [!IMPORTANT] DB_PORT peab olema sama, mis Dockeris määrasid  
+
+### 7. Käivita API olles terminaliga `src` kaustas
+
+```bash
+npm install
+npm test
+```
+
+Et näha kui palju API testidega kaetud on kasuta käsklust -
+
+```bash
+npm run coverage
+```
+
+Kui kõik korras näed terminalis kuidas testid jooksevad:
+
+```bash
+npm test
+
+> code@1.0.0 pretest
+> tsx src/createDatabase.ts
+
+[dotenv@17.2.3] injecting env (9) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+Running query
+Running query
+```  
+
+### Kui soov saada mõlemad andmebaasid siis kõigepealt loo üks ja kopeeri teise juhendist andmebaasi loomist
+
+> [!IMPORTANT]
+> Et kasutada mõlemat andmebaasi SQL kasutajaga siis tuleb sisse logida `root` kasutajaga mille parool on `super-secret` ja anda õigused tava kasutajale.  
+> 
+> Logi sisse ja sisesta käsklus -
+> ```sql
+> GRANT ALL PRIVILEGES ON test.* TO 'disc_golfer'@'%';
+> ```
+> Nüüd on tava kasutajal õigused olemas `exit` root kasutajast ja logi sisse tagasi tavakasutajana. **Voila!**  

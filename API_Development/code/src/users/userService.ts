@@ -13,8 +13,8 @@ const getUserById = async (id: number): Promise<IUsers | undefined> => {
     return rows[0];
 };
 
-const changeUserStatus = async (id: number): Promise<IUsers> => {
-  await pool.query('UPDATE users SET active = NOT active, updated_at = CURRENT_TIMESTAMP WHERE id = ?;', [id]);
+const changeUserStatus = async (id: number, active: boolean ): Promise<IUsers> => {
+  await pool.query('UPDATE users SET active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;', [active, id]);
   const [rows]: [IUsers[], FieldPacket[]] = await pool.query('SELECT id, username , active FROM users WHERE id = ?;', [id]);
   return rows[0];
 };
@@ -41,7 +41,8 @@ const deleteUser = async ( id: number ): Promise<boolean> => {
         await pool.query<ResultSetHeader>(`
             UPDATE users
                 SET deleted_at = CURRENT_TIMESTAMP,
-                    updated_at = CURRENT_TIMESTAMP
+                    updated_at = CURRENT_TIMESTAMP,
+                    active = false
             WHERE id = ? AND deleted_at IS NULL;
             `, [ id ]);
 
@@ -52,18 +53,20 @@ const updateUser = async ( id: number, updates: Partial<Omit<IUsers, 'id'>> ): P
     if (
         updates.email === undefined &&
         updates.username === undefined &&
-        updates.password === undefined
+        updates.password === undefined &&
+        updates.role === undefined
     ) {
         return getUserById(id);
     }
 
     const hashedPassword = updates.password !== undefined 
-                        ?hashService.hash(updates.password) : null;
+                        ? await hashService.hash(updates.password) : null;
     
     const params: ( string | number | null )[] = [
         updates.email ?? null,
         hashedPassword,
         updates.username ?? null,
+        updates.role ?? null,
         id
     ];
 
@@ -73,6 +76,7 @@ const updateUser = async ( id: number, updates: Partial<Omit<IUsers, 'id'>> ): P
             SET email = COALESCE(?, email),
                 password_hash = COALESCE(?, password_hash),
                 username = COALESCE(?, username),
+                user_role = COALESCE(?, user_role),
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
                 AND deleted_at IS NULL;
